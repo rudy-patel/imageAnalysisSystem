@@ -20,7 +20,7 @@ On Windows:
 5. Install Flask in the virtual environment by running the following command: `python -m pip install flask`
 6. In the environment, run `python3 main.py` to run the server in the `main.py` file.
 7. Go to the port specified in the output
-8. To stop the environment, Press CTRL+C to quit
+8. To stop the environment, run `deactivate`
 
 ### Team members
 | Name | Email  |
