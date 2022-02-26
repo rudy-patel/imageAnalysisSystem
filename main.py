@@ -4,21 +4,19 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("home.html", content="Home")
+    return render_template("home.html")
 
 @app.route("/events")
 def events():
-    return render_template("events.html", content="Events")
+    return render_template("events.html")
 
 @app.route("/cameras")
 def cameras():
-    return render_template("cameras.html", content="Cameras")
+    return render_template("cameras.html")
 
 @app.route("/train")
 def train():
-    return render_template("train.html", content="Train")
-
-
+    return render_template("train.html")
 
 # this url route will take the input passed in and display it
 # @app.route("/<name>/")
