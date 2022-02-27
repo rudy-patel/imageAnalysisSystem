@@ -3,17 +3,24 @@
     <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <title>Image Analysis System</title>
+
+        <style>
+            /*Code to change color of active link*/
+            .navbar-nav .active > a {
+                color:#45A6FF !important;
+            }
+        </style>
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Image Analysis System</a>
+            <a class="navbar-brand" href="/">Image Analysis System</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
               <ul class="navbar-nav ml-auto">
                 <li class="nav-item active">
-                  <a class="nav-link text-primary" href="/">Home <span class="sr-only">(current)</span></a>
+                  <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="/events">Events</a>
@@ -25,7 +32,7 @@
                   <a class="nav-link" href="/train">Train</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Log out</a>
+                  <a class="nav-link disabled" href="/">Log out</a>
                 </li>
                 <!-- <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -40,6 +47,29 @@
               </ul>
             </div>
           </nav>
+          <!-- these scripts are a work in progress...  -->
+          <script>
+            $(document).ready(function () {
+                $("nav.navbar > div.collapse > ul.navbar-nav > li").click(function (e) {
+                 $("nav.navbar > div.collapse > ul.navbar-nav > li").removeClass("active");
+                 $(this).addClass("active");
+                  });
+              });
+          </script>
+          <!-- <script type="text/javascript">
+            $(document).ready(function () {
+                $("ul.navbar-nav > li > a").click(
+                  function (e) {
+                    $("ul.navbar-nav > li").removeClass(
+                      "active");
+                    $("ul.navbar-nav > li > a").css(
+                      "color", "");
+ 
+                    $(this).addClass("active");
+                    $(this).css("color", "blue");
+                });
+            });
+        </script> -->
         <!-- <h1>Image Analysis System</h1> -->
         {% block content %}
         {% endblock %}
