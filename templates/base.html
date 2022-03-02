@@ -32,18 +32,8 @@
                   <a class="nav-link" href="/train">Train</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link disabled" href="/">Log out</a>
+                  <a class="nav-link" href="{{ url_for('logout') }}">Log out</a>
                 </li>
-                <!-- <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown link
-                  </a>
-                  <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                  </div>
-                </li> -->
               </ul>
             </div>
           </nav>
@@ -70,7 +60,6 @@
                 });
             });
         </script> -->
-        <!-- <h1>Image Analysis System</h1> -->
         {% block content %}
         {% endblock %}
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
