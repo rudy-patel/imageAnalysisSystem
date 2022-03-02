@@ -9,4 +9,3 @@ flask-login
 flask_wtf
 email_validator
 flask_bootstrap
-pysqlite3
