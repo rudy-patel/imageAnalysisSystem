@@ -4,14 +4,15 @@
 }
 
 [class*="col"] {
-    padding: 1rem;
-    text-align: center;
+    /* padding: 1rem; */
+    /* text-align: center; */
+    /* border: 1px solid #2196F3; */
 }
 
 [class*="row"] {
-    padding: 1rem;
-    justify-content: center;
-    align-items: center;
+    /* padding: 1rem; */
+    justify-content:flex-start;
+    /* border: 1px solid red; */
 }
 
 [class*="con"] {

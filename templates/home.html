@@ -3,14 +3,16 @@
 <div class="container">
     <div class="row">
         <div class="col-8">
-            <div class="row justify-content-start">Camera #1 Active</div>
             <div class="row">
-                <!-- 16:9 aspect ratio -->
-                <div class="embed-responsive embed-responsive-16by9">
-                    <iframe class="embed-responsive-item" src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></iframe>
-                </div>
+                <h4>Camera #1 Active</h4>
             </div>
             <div class="row">
+                <!-- 16:9 aspect ratio -->
+                <div class="embed-responsive embed-responsive-4by3">
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="row justify-content-center">
                 <div class="col">Facial recognition</div>
                 <div class="col">
                     <label class="switch">
@@ -20,12 +22,14 @@
                 </div>
                 <div class="col">Fault detection</div>
             </div>
-            <div class="row ">
+            <div class="row justify-content-center">
                 <button type="button" class="btn btn-primary">Capture Image</button>
             </div>
         </div>
         <div class="col-4">
-            <div class="row">Recent Notifications</div>
+            <div class="row justify-content-center">
+                <h4>Recent Notifications</h4>
+            </div>
             <table class="table table-striped">
                 <tbody>
                   <tr>
