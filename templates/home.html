@@ -1,4 +1,69 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Welcome, {{ name }}!</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-8">
+            <div class="row">
+                <h4>Camera #1 Active</h4>
+            </div>
+            <div class="row">
+                <!-- 16:9 aspect ratio -->
+                <div class="embed-responsive embed-responsive-4by3">
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col">Facial recognition</div>
+                <div class="col">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                      </label>
+                </div>
+                <div class="col">Fault detection</div>
+            </div>
+            <div class="row justify-content-center">
+                <button type="button" class="btn btn-primary">Capture Image</button>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="row justify-content-center">
+                <h4>Recent Notifications</h4>
+            </div>
+            <table class="table table-striped">
+                <tbody>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>Motion Detected</td>
+                    <td>
+                        <button type="button" class="btn btn-primary">Go to Cameras</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>Image Captured</td>
+                    <td>
+                        <button type="button" class="btn btn-primary">Go to Train</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>Face Detected</td>
+                    <td>
+                        <button type="button" class="btn btn-primary">Go to Train</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>Fault Detected</td>
+                    <td>
+                        <button type="button" class="btn btn-primary">Go to Train</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
