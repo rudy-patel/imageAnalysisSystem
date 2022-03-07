@@ -1,4 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 <h3>Train</h3>
+<body>
+  <!--
+    <div class="container">
+      <div class="input-group">
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="customFileInput" aria-describedby="customFileInput">
+          <label class="custom-file-label" for="customFileInput">Select file</label>
+        </div>
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="button" id="customFileInput">Upload</button>
+        </div>
+      </div>
+    </div>
+    -->
+    <h1>File Upload</h1>
+    <form method="POST" action="" enctype="multipart/form-data">
+      <p><input type="file" name="file"></p>
+      <p><input type="submit" value="Submit"></p>
+    </form>
+  </body>
 {% endblock %}
