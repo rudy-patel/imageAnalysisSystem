@@ -95,8 +95,6 @@ def train():
 def upload_file():
     file = request.files['file']
     if file.filename != '':
-        print("Got file" + file.filename)
-        #uploaded_file.save(uploaded_file.filename)
         if file:
             file.filename = secure_filename(file.filename)
             output = send_to_s3(file, "lfiasimagestore")
@@ -107,11 +105,8 @@ def upload_file():
 
 
 def send_to_s3(file, bucket_name):
-        s3 = boto3.client('s3', 
-                    aws_access_key_id="AKIAVFCBRF2YXLFX7GJX", 
-                    aws_secret_access_key="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", 
-                    region_name="us-west-2"
-                    )
+        session = boto3.Session(profile_name='default')
+        s3 = session.client('s3')
         try:
             s3.upload_fileobj(
                 file,
