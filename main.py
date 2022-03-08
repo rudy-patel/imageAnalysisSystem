@@ -1,15 +1,22 @@
 from ast import Pass
-from flask import Flask, redirect, url_for, render_template
+from crypt import methods
+from flask import Flask, redirect, url_for, render_template, request
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask import flash
 from Forms import LoginForm, SignUpForm
+import boto3
+
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'imageanalysissystem'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+#CONFIG AWS KEYS/BUCKET DETAILS
+#app.config["S3_LOCATION"] = "us-west-2"
 Bootstrap(app)
 
 db = SQLAlchemy(app)
@@ -82,6 +89,40 @@ def cameras():
 @login_required
 def train():
     return render_template("train.html")
+
+
+@app.route("/train", methods=['POST'])
+def upload_file():
+    file = request.files['file']
+    if file.filename != '':
+        if file:
+            file.filename = secure_filename(file.filename)
+            output = send_to_s3(file, "lfiasimagestore")
+            return str(output)
+    else:
+        return redirect("/")
+    return redirect(url_for('train'))
+
+
+def send_to_s3(file, bucket_name):
+        session = boto3.Session(profile_name='default')
+        s3 = session.client('s3')
+        try:
+            s3.upload_fileobj(
+                file,
+                bucket_name,
+                file.filename,
+                ExtraArgs={
+                    "ContentType": file.content_type    #Set appropriate content type as per the file
+                }
+            )
+        except Exception as e:
+            print("Something Happened: ", e)
+            return e
+        return "{} recieved {}".format("us-west-2", file.filename)
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
