@@ -14,9 +14,12 @@ import boto3
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'imageanalysissystem'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-#CONFIG AWS KEYS/BUCKET DETAILS
-#app.config["S3_LOCATION"] = "us-west-2"
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:postgres@localhost/DB_NAME'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/lfiasdb'
+#REMOVE HARDCODED PASSWORD
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:dolce5719@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
+
+
 Bootstrap(app)
 
 db = SQLAlchemy(app)
@@ -25,7 +28,7 @@ loginManager = LoginManager()
 loginManager.init_app(app)
 loginManager.login_view = 'login'
 
-class User(db.Model, UserMixin):
+class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     email = db.Column(db.String(50), unique=True)
@@ -33,7 +36,7 @@ class User(db.Model, UserMixin):
     
 @loginManager.user_loader
 def loadUser(id):
-    return User.query.get(int(id))
+    return Users.query.get(int(id))
 
 @app.route("/home")
 @app.route("/")
@@ -46,7 +49,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Users.query.filter_by(email=form.email.data).first()
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user)
@@ -60,7 +63,7 @@ def signup():
 
     if form.validate_on_submit():
         hashedPassword = generate_password_hash(form.password.data, method='sha256')
-        newUser = User(name=form.name.data, email= form.email.data, password=hashedPassword)
+        newUser = Users(name=form.name.data, email= form.email.data, password=hashedPassword)
 
         db.session.add(newUser)
         db.session.commit()
