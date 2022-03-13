@@ -1,5 +1,6 @@
 from ast import Pass
 from crypt import methods
+from datetime import datetime
 from flask import Flask, redirect, url_for, render_template, request
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
@@ -9,15 +10,12 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask import flash
 from Forms import LoginForm, SignUpForm
 import boto3
-
-
+from enums.cameraEnums import CameraMode, CameraStatus
+from os import environ
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'imageanalysissystem'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:postgres@localhost/DB_NAME'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/lfiasdb'
-#REMOVE HARDCODED PASSWORD
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:dolce5719@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + os.environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
 
 
 Bootstrap(app)
@@ -30,13 +28,51 @@ loginManager.login_view = 'login'
 
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    email = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(80))
+    name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(80), nullable=False)
+    events = db.relationship('Event', backref='user', lazy=True)
+    cameras = db.relationship('Camera', backref='user', lazy=True)
+
+class Event(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    camera_id = db.Column(db.Integer, db.ForeignKey('camera.id'), nullable=False)
+    type = db.Column(db.Enum(EventType), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
+
+class Camera(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    status = db.Column(db.Enum(CameraStatus), nullable=False)
+    mode = db.Column(db.Enum(CameraMode), nullable=False)
     
 @loginManager.user_loader
 def loadUser(id):
     return Users.query.get(int(id))
+
+@app.route("/addEvent")
+@login_required
+def testAddEvent():
+    
+    newEvent = Event(user_id=current_user.id, camera_id=1, type=EventType.FACIAL_MATCH_SUCCESS, timestamp=datetime.now())
+
+    db.session.add(newEvent)
+    db.session.commit()
+
+    return redirect(url_for('home'))
+
+@app.route("/addCamera")
+@login_required
+def testAddCamera():
+    
+    newCamera = Camera(user_id=current_user.id, name="Camera #" + str(current_user.id), status=CameraStatus.OFFLINE, mode=CameraMode.FACIAL_RECOGNITION)
+
+    db.session.add(newCamera)
+    db.session.commit()
+    
+    return redirect(url_for('home'))
 
 @app.route("/home")
 @app.route("/")
@@ -63,13 +99,18 @@ def signup():
 
     if form.validate_on_submit():
         hashedPassword = generate_password_hash(form.password.data, method='sha256')
-        newUser = Users(name=form.name.data, email= form.email.data, password=hashedPassword)
 
-        db.session.add(newUser)
-        db.session.commit()
+        isUserExisting = Users.query.filter_by(email=form.email.data).first()
 
-        return redirect(url_for('login'))
+        if not isUserExisting:
+            newUser = Users(name=form.name.data, email= form.email.data, password=hashedPassword)
 
+            db.session.add(newUser)
+            db.session.commit()
+
+            return redirect(url_for('login'))
+            
+        flash("A user already exists with that email!")
     return render_template("signup.html", form=form)
 
 @app.route('/logout')
@@ -123,9 +164,6 @@ def send_to_s3(file, bucket_name):
             print("Something Happened: ", e)
             return e
         return "{} recieved {}".format("us-west-2", file.filename)
-
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
