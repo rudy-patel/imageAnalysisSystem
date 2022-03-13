@@ -99,13 +99,18 @@ def signup():
 
     if form.validate_on_submit():
         hashedPassword = generate_password_hash(form.password.data, method='sha256')
-        newUser = User(name=form.name.data, email= form.email.data, password=hashedPassword)
 
-        db.session.add(newUser)
-        db.session.commit()
+        isUserExisting = User.query.filter_by(email=form.email.data).first()
 
-        return redirect(url_for('login'))
+        if not isUserExisting:
+            newUser = User(name=form.name.data, email= form.email.data, password=hashedPassword)
 
+            db.session.add(newUser)
+            db.session.commit()
+
+            return redirect(url_for('login'))
+            
+        flash("A user already exists with that email!")
     return render_template("signup.html", form=form)
 
 @app.route('/logout')
