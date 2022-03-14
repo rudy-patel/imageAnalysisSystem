@@ -11,11 +11,12 @@ from flask import flash
 from Forms import LoginForm, SignUpForm
 import boto3
 from enums.cameraEnums import CameraMode, CameraStatus
+from enums.eventEnums import EventType
 from os import environ
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'imageanalysissystem'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + os.environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
 
 
 Bootstrap(app)
@@ -31,19 +32,19 @@ class Users(db.Model, UserMixin):
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
-    events = db.relationship('Event', backref='user', lazy=True)
-    cameras = db.relationship('Camera', backref='user', lazy=True)
+    events = db.relationship('Event', backref='users', lazy=True)
+    cameras = db.relationship('Camera', backref='users', lazy=True)
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     camera_id = db.Column(db.Integer, db.ForeignKey('camera.id'), nullable=False)
     type = db.Column(db.Enum(EventType), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
 class Camera(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(50), nullable=False)
     status = db.Column(db.Enum(CameraStatus), nullable=False)
     mode = db.Column(db.Enum(CameraMode), nullable=False)
