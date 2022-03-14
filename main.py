@@ -12,12 +12,13 @@ from Forms import LoginForm, SignUpForm
 import boto3
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
+from os import environ
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'imageanalysissystem'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/database.db'
-#CONFIG AWS KEYS/BUCKET DETAILS
-#app.config["S3_LOCATION"] = "us-west-2"
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
+
+
 Bootstrap(app)
 
 db = SQLAlchemy(app)
@@ -26,31 +27,31 @@ loginManager = LoginManager()
 loginManager.init_app(app)
 loginManager.login_view = 'login'
 
-class User(db.Model, UserMixin):
+class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
-    events = db.relationship('Event', backref='user', lazy=True)
-    cameras = db.relationship('Camera', backref='user', lazy=True)
+    events = db.relationship('Event', backref='users', lazy=True)
+    cameras = db.relationship('Camera', backref='users', lazy=True)
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     camera_id = db.Column(db.Integer, db.ForeignKey('camera.id'), nullable=False)
     type = db.Column(db.Enum(EventType), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
 class Camera(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(50), nullable=False)
     status = db.Column(db.Enum(CameraStatus), nullable=False)
     mode = db.Column(db.Enum(CameraMode), nullable=False)
     
 @loginManager.user_loader
 def loadUser(id):
-    return User.query.get(int(id))
+    return Users.query.get(int(id))
 
 @app.route("/addEvent")
 @login_required
@@ -85,7 +86,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Users.query.filter_by(email=form.email.data).first()
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user)
@@ -100,10 +101,10 @@ def signup():
     if form.validate_on_submit():
         hashedPassword = generate_password_hash(form.password.data, method='sha256')
 
-        isUserExisting = User.query.filter_by(email=form.email.data).first()
+        isUserExisting = Users.query.filter_by(email=form.email.data).first()
 
         if not isUserExisting:
-            newUser = User(name=form.name.data, email= form.email.data, password=hashedPassword)
+            newUser = Users(name=form.name.data, email= form.email.data, password=hashedPassword)
 
             db.session.add(newUser)
             db.session.commit()
