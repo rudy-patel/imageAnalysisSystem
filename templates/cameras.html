@@ -1,4 +1,62 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Cameras</h3>
+<div class="container">
+    <div class="row justify-content-center">
+        <h4>Cameras</h4>
+    </div>
+    <div class="row">
+        <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">Status</th>
+                <th scope="col">Camera Name</th>
+                <th scope="col">Mode</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Online</td>
+                <td>Camera #1</td>
+                <td>Facial Recognition</td>
+                <td>
+                    <button type="button" class="btn btn-primary">Select</button>
+                    <button type="button" class="btn btn-primary">Delete</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Offline</td>
+                <td>Camera #2</td>
+                <td>Facial Recognition</td>
+                <td>
+                    <button type="button" class="btn btn-primary">Select</button>
+                    <button type="button" class="btn btn-primary">Delete</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Offline</td>
+                <td>Camera #3</td>
+                <td>Facial Recognition</td>
+                <td>
+                    <button type="button" class="btn btn-primary">Select</button>
+                    <button type="button" class="btn btn-primary">Delete</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Offline</td>
+                <td>Camera #4</td>
+                <td>Fault Detection</td>
+                <td>
+                    <button type="button" class="btn btn-primary">Select</button>
+                    <button type="button" class="btn btn-primary">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+    <div class="row justify-content-center">
+        <button type="button" class="btn btn-primary">Add a camera</button>
+    </div>
+</div>
+
 {% endblock %}

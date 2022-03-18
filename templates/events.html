@@ -1,4 +1,67 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Events</h3>
+<div class="container">
+    <div class="row justify-content-center">
+        <h4>Recent Notifications</h4>
+    </div>
+    <div class="row">
+        <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">Sensor</th>
+                <th scope="col">Type</th>
+                <th scope="col">Time</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Proximity Sensor</td>
+                <td>Motion Detected</td>
+                <td>
+                    10:42 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Cameras</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Camera #1</td>
+                <td>Image Captured</td>
+                <td>
+                    10:41 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Train</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Camera #2</td>
+                <td>Face Detected</td>
+                <td>
+                    10:40 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Train</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Camera #1</td>
+                <td>Fault Detected</td>
+                <td>
+                    6:42 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Train</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+</div>
+
 {% endblock %}
