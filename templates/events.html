@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
+<div class="container mb-3 mt-3">
     <div class="row justify-content-center">
-        <h4>Recent Notifications</h4>
+        <h3>Events</h3>
     </div>
-    <div class="row">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped events-table" style="width: 100%">
             <thead>
               <tr>
-                <th scope="col">Sensor</th>
-                <th scope="col">Type</th>
-                <th scope="col">Time</th>
-                <th scope="col">Action</th>
+                <th>Sensor</th>
+                <th>Type</th>
+                <th>Time</th>
+                <th>Action</th>
               </tr>
             </thead>
+
             <tbody>
               <tr>
                 <td>Proximity Sensor</td>
@@ -59,9 +59,130 @@
                     <button type="button" class="btn btn-primary">Go to Train</button>
                 </td>
               </tr>
+              <tr>
+                <td>Proximity Sensor</td>
+                <td>Motion Detected</td>
+                <td>
+                    10:42 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Cameras</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Camera #1</td>
+                <td>Image Captured</td>
+                <td>
+                    10:41 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Train</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Camera #2</td>
+                <td>Face Detected</td>
+                <td>
+                    10:40 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Train</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Camera #1</td>
+                <td>Fault Detected</td>
+                <td>
+                    6:42 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Train</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Proximity Sensor</td>
+                <td>Motion Detected</td>
+                <td>
+                    10:42 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Cameras</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Camera #1</td>
+                <td>Image Captured</td>
+                <td>
+                    10:41 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Train</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Camera #2</td>
+                <td>Face Detected</td>
+                <td>
+                    10:40 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Train</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Camera #1</td>
+                <td>Fault Detected</td>
+                <td>
+                    6:42 am
+                    27/02/2022
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary">Go to Train</button>
+                </td>
+              </tr>
             </tbody>
+
+            <tfoot>
+              <tr>
+                <th scope="col">Sensor</th>
+                <th scope="col">Type</th>
+                <th scope="col">Time</th>
+                <th scope="col">Action</th>
+              </tr>
+            </tfoot>
           </table>
-    </div>
+          <div class="d-flex justify-content-center mt-2">
+            <ul class="pagination"></ul>
+          </div>
 </div>
+
+<script>
+  
+  var table = $('.events-table').DataTable({
+    searching: true, // enable search input
+    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]] // custom number of entries
+  });
+
+  $('.events-table tfoot th').each( function () {
+    var title = $(this).text();
+    $(this).html('<input type="text" placeholder="Search by '+title+'" />');
+  });
+
+  table.columns().every( function () {
+    var that = this;
+    $('input', this.footer() ).on('keyup change', function () {
+      if ( that.search() !== this.value ) {
+        that.search( this.value ).draw();
+      }
+    });
+  })
+</script>
 
 {% endblock %}
