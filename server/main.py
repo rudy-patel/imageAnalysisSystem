@@ -1,23 +1,31 @@
 from ast import Pass
 from crypt import methods
 from datetime import datetime
-from flask import Flask, redirect, url_for, render_template, request
-from flask_bootstrap import Bootstrap
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask import flash
-from Forms import LoginForm, SignUpForm
-import boto3
+# from db_classes.users import Users
+# from db_classes.event import Event
+# from db_classes.camera import Camera
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
+from flask import Flask, redirect, url_for, render_template, request, flash
+from flask_bootstrap import Bootstrap
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_sqlalchemy import SQLAlchemy
+from Forms import LoginForm, SignUpForm
+from imutils import build_montages
 from os import environ
+from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
+import argparse
+import boto3
+import cv2
+import imagezmq
+import imutils
+import numpy as np
 
+# Configuration and settings
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'imageanalysissystem'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
-
 
 Bootstrap(app)
 
@@ -26,6 +34,8 @@ db = SQLAlchemy(app)
 loginManager = LoginManager()
 loginManager.init_app(app)
 loginManager.login_view = 'login'
+
+
 
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
