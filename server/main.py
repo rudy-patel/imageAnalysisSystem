@@ -37,23 +37,17 @@ loginManager = LoginManager()
 loginManager.init_app(app)
 loginManager.login_view = 'login'
 
-# UNTESTED  Access files from a relative path
-def relative_file_path(rel_path):
-    script_path = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_path, rel_path)
 
-
-
-# # START IN PROGRESS #1 
-# # Construct the argument parser and parse the required arguments
+# START IN PROGRESS #1 
+# Construct the argument parser and parse the required arguments
 # ap = argparse.ArgumentParser()
-# ap.add_argument("-p", "--prototxt", required=True, help="path to Caffe 'deploy' prototxt file")
-# ap.add_argument("-m", "--model", required=True, help="path to Caffe pre-trained model")  # pre-trained model
-# ap.add_argument("-c", "--confidence", type=float, default=0.2, help="minimum probability to filter weak detections")
 # ap.add_argument("-mW", "--montageW", required=True, type=int, help="montage frame width")  # video feed columns
 # ap.add_argument("-mH", "--montageH", required=True, type=int, help="montage frame height") # video feed rows
 # args = vars(ap.parse_args())
-# # END IN PROGRESS #1
+
+# mW = args["montageW"]
+# mH = args["montageH"]
+# END IN PROGRESS #1
 
 
 
@@ -95,15 +89,14 @@ def video_feed(feed_type, device):
         return Response(gen(camera_stream=camera_stream(feed_type, device, port_list), feed_type=feed_type, device=device),
                         mimetype='multipart/x-mixed-replace; boundary=frame')
 
-    elif feed_type == 'yolo':
-        camera_stream = import_module('camera_yolo').Camera
-        return Response(gen(camera_stream=camera_stream(feed_type, device, port_list), feed_type=feed_type, device=device),
-                        mimetype='multipart/x-mixed-replace; boundary=frame')
+    # elif feed_type == 'yolo':
+    #     camera_stream = import_module('camera_yolo').Camera
+    #     return Response(gen(camera_stream=camera_stream(feed_type, device, port_list), feed_type=feed_type, device=device),
+    #                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
         
 
 # END IN PROGRESS #2
-
 
 
 

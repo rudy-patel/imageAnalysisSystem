@@ -95,7 +95,7 @@ class BaseCamera:
         raise RuntimeError('Must be implemented by subclasses')
 
     @staticmethod
-    def face_frames(unique_name):
+    def yolo_frames(unique_name):
         """"Generator that returns frames from the camera."""
         raise RuntimeError('Must be implemented by subclasses')
 
@@ -105,10 +105,10 @@ class BaseCamera:
         raise RuntimeError('Must be implemented by subclasses')
 
     @classmethod
-    def face_thread(cls, unique_name):
+    def yolo_thread(cls, unique_name):
         device = unique_name[1]
 
-        frames_iterator = cls.face_frames(unique_name)
+        frames_iterator = cls.yolo_frames(unique_name)
         try:
             for frame in frames_iterator:
                 BaseCamera.frame[unique_name] = frame
@@ -116,12 +116,12 @@ class BaseCamera:
                 time.sleep(0)
                 if time.time() - BaseCamera.last_access[unique_name] > 60:
                     frames_iterator.close()
-                    print('Stopping face thread for device {} due to inactivity.'.format(device))
+                    print('Stopping YOLO thread for device {} due to inactivity.'.format(device))
                     pass
         except Exception as e:
             BaseCamera.event[unique_name].set()  # send signal to clients
             frames_iterator.close()
-            print('Stopping face thread for device {} due to error.'.format(device))
+            print('Stopping YOLO thread for device {} due to error.'.format(device))
             print(e)
 
     @classmethod
@@ -157,9 +157,9 @@ class BaseCamera:
             print('Starting server thread for device {} at port {}.'.format(device, port))
             cls.server_thread(unique_name, port)
 
-        elif feed_type == 'face':
+        elif feed_type == 'yolo':
             """Camera background thread."""
-            print('Starting face thread for device {}.'.format(device))
-            cls.face_thread(unique_name)
+            print('Starting YOLO thread for device {}.'.format(device))
+            cls.yolo_thread(unique_name)
 
         BaseCamera.threads[unique_name] = None
