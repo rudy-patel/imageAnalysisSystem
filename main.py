@@ -1,18 +1,18 @@
 from ast import Pass
 from crypt import methods
 from datetime import datetime
-from flask import Flask, redirect, url_for, render_template, request
-from flask_bootstrap import Bootstrap
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask import flash
-from Forms import LoginForm, SignUpForm
-import boto3
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
+from flask import Flask, redirect, url_for, render_template, request, jsonify, flash
+from flask_bootstrap import Bootstrap
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_sqlalchemy import SQLAlchemy
+from Forms import LoginForm, SignUpForm
 from os import environ
+from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
+import boto3
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'imageanalysissystem'
@@ -49,6 +49,22 @@ class Camera(db.Model):
     status = db.Column(db.Enum(CameraStatus), nullable=False)
     mode = db.Column(db.Enum(CameraMode), nullable=False)
     
+
+
+
+# EXAMPLE OF API ENDPOINT TIED TO SIMPLE-CLIENT
+
+@app.route("/pi", methods=["GET", "POST"])
+def index():
+    notdata = 'test'
+    if(request.method == "POST"):
+        data = 'hello_world'
+        return jsonify({'data': data})
+    return render_template("cameras.html")
+
+# --------
+
+
 @loginManager.user_loader
 def loadUser(id):
     return Users.query.get(int(id))
