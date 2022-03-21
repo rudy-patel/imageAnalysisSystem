@@ -57,7 +57,7 @@ def loadUser(id):
 @login_required
 def testAddEvent():
     
-    newEvent = Event(user_id=current_user.id, camera_id=1, type=EventType.FACIAL_MATCH_SUCCESS, timestamp=datetime.now())
+    newEvent = Event(user_id=current_user.id, camera_id=1, type=EventType.IMAGE_CAPTURE_SUCCESS, timestamp=datetime.now())
 
     db.session.add(newEvent)
     db.session.commit()
@@ -123,12 +123,19 @@ def logout():
 @app.route("/events")
 @login_required
 def events():
-    return render_template("events.html")
+    events = Event.query.order_by(Event.timestamp).all()
+    for event in events:
+        event.type = event.type.value
+    return render_template("events.html", events=events)
 
 @app.route("/cameras")
 @login_required
 def cameras():
-    return render_template("cameras.html")
+    cameras = Camera.query.order_by(Camera.status).all()
+    for camera in cameras:
+        camera.status = camera.status.value
+        camera.mode = camera.mode.value
+    return render_template("cameras.html", cameras=cameras)
 
 @app.route("/train")
 @login_required
