@@ -1,18 +1,17 @@
 from ast import Pass
 from crypt import methods
 from datetime import datetime
+from enums.cameraEnums import CameraMode, CameraStatus
+from enums.eventEnums import EventType
 from flask import Flask, redirect, url_for, render_template, request, jsonify, flash
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
+from Forms import LoginForm, SignUpForm
+from os import environ
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import 
-from Forms import LoginForm, SignUpForm
 import boto3
-from enums.cameraEnums import CameraMode, CameraStatus
-from enums.eventEnums import EventType
-from os import environ
 
 
 app = Flask(__name__)
