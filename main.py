@@ -123,7 +123,8 @@ def logout():
 @app.route("/events")
 @login_required
 def events():
-    return render_template("events.html")
+    users = Event.query.order_by(Event.timestamp).limit(10).all()
+    return render_template("events.html", users=users)
 
 @app.route("/cameras")
 @login_required

@@ -15,50 +15,16 @@
               </tr>
             </thead>
             <tbody>
+              {% for user in users %}
               <tr>
-                <td>Proximity Sensor</td>
-                <td>Motion Detected</td>
-                <td>
-                    10:42 am
-                    27/02/2022
-                </td>
+                <td>Camera #{{user.camera_id}}</td>
+                <td>{{user.type}}</td>
+                <td>{{user.timestamp}}</td>
                 <td>
                     <button type="button" class="btn btn-primary">Go to Cameras</button>
                 </td>
               </tr>
-              <tr>
-                <td>Camera #1</td>
-                <td>Image Captured</td>
-                <td>
-                    10:41 am
-                    27/02/2022
-                </td>
-                <td>
-                    <button type="button" class="btn btn-primary">Go to Train</button>
-                </td>
-              </tr>
-              <tr>
-                <td>Camera #2</td>
-                <td>Face Detected</td>
-                <td>
-                    10:40 am
-                    27/02/2022
-                </td>
-                <td>
-                    <button type="button" class="btn btn-primary">Go to Train</button>
-                </td>
-              </tr>
-              <tr>
-                <td>Camera #1</td>
-                <td>Fault Detected</td>
-                <td>
-                    6:42 am
-                    27/02/2022
-                </td>
-                <td>
-                    <button type="button" class="btn btn-primary">Go to Train</button>
-                </td>
-              </tr>
+              {% endfor %}
             </tbody>
           </table>
     </div>
