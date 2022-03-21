@@ -15,42 +15,17 @@
               </tr>
             </thead>
             <tbody>
+              {% for camera in cameras %}
               <tr>
-                <td>Online</td>
-                <td>Camera #1</td>
-                <td>Facial Recognition</td>
+                <td>{{camera.status}}</td>
+                <td>{{camera.name}}</td>
+                <td>{{camera.mode}}</td>
                 <td>
                     <button type="button" class="btn btn-primary">Select</button>
                     <button type="button" class="btn btn-primary">Delete</button>
                 </td>
               </tr>
-              <tr>
-                <td>Offline</td>
-                <td>Camera #2</td>
-                <td>Facial Recognition</td>
-                <td>
-                    <button type="button" class="btn btn-primary">Select</button>
-                    <button type="button" class="btn btn-primary">Delete</button>
-                </td>
-              </tr>
-              <tr>
-                <td>Offline</td>
-                <td>Camera #3</td>
-                <td>Facial Recognition</td>
-                <td>
-                    <button type="button" class="btn btn-primary">Select</button>
-                    <button type="button" class="btn btn-primary">Delete</button>
-                </td>
-              </tr>
-              <tr>
-                <td>Offline</td>
-                <td>Camera #4</td>
-                <td>Fault Detection</td>
-                <td>
-                    <button type="button" class="btn btn-primary">Select</button>
-                    <button type="button" class="btn btn-primary">Delete</button>
-                </td>
-              </tr>
+              {% endfor %}
             </tbody>
           </table>
     </div>
