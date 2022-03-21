@@ -123,15 +123,19 @@ def logout():
 @app.route("/events")
 @login_required
 def events():
-    users = Event.query.order_by(Event.timestamp).all()
-    for user in users:
-        user.type = user.type.value
-    return render_template("events.html", users=users)
+    events = Event.query.order_by(Event.timestamp).all()
+    for event in events:
+        event.type = event.type.value
+    return render_template("events.html", events=events)
 
 @app.route("/cameras")
 @login_required
 def cameras():
-    return render_template("cameras.html")
+    cameras = Camera.query.order_by(Camera.status).all()
+    for camera in cameras:
+        camera.status = camera.status.value
+        camera.mode = camera.mode.value
+    return render_template("cameras.html", cameras=cameras)
 
 @app.route("/train")
 @login_required
