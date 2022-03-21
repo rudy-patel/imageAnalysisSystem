@@ -6,7 +6,7 @@ from base_camera import BaseCamera
 import warnings
 import numpy as np
 from PIL import Image
-from yolo import YOLO
+#from yolo import YOLO  NOTE: need to replace the YOLO (deep learning object detection model) with facial recognition model
 from deep_sort import preprocessing
 from deep_sort.detection import Detection
 from deep_sort.detection_yolo import Detection_YOLO
