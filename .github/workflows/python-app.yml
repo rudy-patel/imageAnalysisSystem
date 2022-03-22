@@ -14,7 +14,7 @@ on:
 jobs:
   build:
     env:
-      DB_PASSWORD: dolce5719
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     runs-on: ubuntu-latest
 
     steps:
@@ -35,7 +35,5 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
-      env:
-          DB_PASSWORD: ${{ env.DB_PASSWORD }}
       run: |
         python -m pytest
