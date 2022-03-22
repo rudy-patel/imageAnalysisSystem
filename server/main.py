@@ -6,7 +6,7 @@ from datetime import datetime
 # from db_classes.camera import Camera
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
-from flask import Flask, redirect, url_for, render_template, request, flash
+from flask import Flask, redirect, url_for, render_template, request, flash, Response
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
@@ -15,6 +15,7 @@ from imutils import build_montages
 from os import environ
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from importlib import import_module
 import argparse
 import boto3
 import cv2
@@ -38,65 +39,34 @@ loginManager.init_app(app)
 loginManager.login_view = 'login'
 
 
-# START IN PROGRESS #1 
-# Construct the argument parser and parse the required arguments
-# ap = argparse.ArgumentParser()
-# ap.add_argument("-mW", "--montageW", required=True, type=int, help="montage frame width")  # video feed columns
-# ap.add_argument("-mH", "--montageH", required=True, type=int, help="montage frame height") # video feed rows
-# args = vars(ap.parse_args())
 
-# mW = args["montageW"]
-# mH = args["montageH"]
-# END IN PROGRESS #1
+#Generating funtion for video stream, produces frames from the PI one by one 
+def generate_frame(camera_stream):
+    #unique_name = (feed_type, device)
 
-
-
-# START IN PROGRESS #2
-# Live video streaming over the network
-@app.route("/livestream")
-def index():
-    """Video Streaming Page"""
-    render_template("livestream.html")
-
-def gen(camera_stream, feed_type, device):
-    """Generating function for video streaming"""
-    unique_name = (feed_type, device)
-
-    while True:
-        cam_id, frame = camera_stream.get_frame(unique_name)
-        if frame is None:
-            break
-
+    #while True:
+    #    cam_id, frame = camera_stream.get_frame()
+    #    if frame is None:
+    #        break
+    print("Generating frame")
+    cam_id, frame = camera_stream.get_frame()
     # Write the camera name
-    cv2.putText(frame, cam_id, (int(20), int(20 * 5e-3 * frame.shape[0])), 0, 2e-3 * frame.shape[0], (255, 255, 255), 2)
+    #cv2.putText(frame, cam_id, (int(20), int(20 * 5e-3 * frame.shape[0])), 0, 2e-3 * frame.shape[0], (255, 255, 255), 2)
 
-        if feed_type == 'yolo':
-            # Removed FPS functionality
-            # cv2.putText(frame, "FPS: %.2f" % fps, (int(20), int(40 * 5e-3 * frame.shape[0])), 0, 2e-3 * frame.shape[0],
-            #             (255, 255, 255), 2)
-
-        frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
+    return (b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 
-@app.route('/video_feed/<feed_type>/<device>')
-def video_feed(feed_type, device):
-    """Video streaming route. Put this in the src attribute of an img tag."""
-    port_list = (5555, 5566)
-    if feed_type == 'camera':
-        camera_stream = import_module('camera_server').Camera
-        return Response(gen(camera_stream=camera_stream(feed_type, device, port_list), feed_type=feed_type, device=device),
-                        mimetype='multipart/x-mixed-replace; boundary=frame')
+#Video stream, should be the soucre of the homepage video image
+@app.route('/video_feed')
+def video_feed():
 
-    # elif feed_type == 'yolo':
-    #     camera_stream = import_module('camera_yolo').Camera
-    #     return Response(gen(camera_stream=camera_stream(feed_type, device, port_list), feed_type=feed_type, device=device),
-    #                     mimetype='multipart/x-mixed-replace; boundary=frame')
+    camera_stream = import_module('server_camera').Camera
+    return Response(generate_frame(camera_stream=camera_stream()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
-        
 
-# END IN PROGRESS #2
 
 
 
@@ -240,4 +210,4 @@ def send_to_s3(file, bucket_name):
         return "{} recieved {}".format("us-west-2", file.filename)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", threaded=True, debug=True)
+    app.run(host="127.0.0.1", threaded=True, debug=True)
