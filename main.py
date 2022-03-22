@@ -242,4 +242,4 @@ def send_to_s3(file, bucket_name):
         return "{} recieved {}".format("us-west-2", file.filename)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
