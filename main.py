@@ -27,6 +27,8 @@ loginManager = LoginManager()
 loginManager.init_app(app)
 loginManager.login_view = 'login'
 
+# Database Models
+
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -34,6 +36,14 @@ class Users(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
     events = db.relationship('Event', backref='users', lazy=True)
     cameras = db.relationship('Camera', backref='users', lazy=True)
+
+    # def __init__(self, name, email, password):
+    #     self.name = name
+    #     self.email = email
+    #     self.password = password
+
+    # def create(self):
+
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,7 +65,7 @@ class Camera(db.Model):
     status = db.Column(db.Enum(CameraStatus), nullable=False)
     mode = db.Column(db.Enum(CameraMode), nullable=False)
     
-
+# ------------
 
 
 # EXAMPLE OF API ENDPOINT TIED TO SIMPLE-CLIENT
@@ -74,7 +84,7 @@ def index():
 # API Endpoints
 # TODO integrate with our token-based security to lock down these endpoints as per best practices
 
-@app.route("/events/<int:user_id>", methods=["POST"])
+@app.route("/v1/events/<int:user_id>", methods=["POST"])
 def update(user_id):
 
     try:
@@ -83,20 +93,21 @@ def update(user_id):
             abort(404)
         
         data = request.get_json()
-        user_id = data.get('user_id')
         camera_id = data.get('camera_id')
         # TODO add a check if camera id is in the list of already known database cameras, otherwise abort
         event_type=data.get('event_type')
         timestamp = data.get('timestamp')
-        who = data.get('who')
+        #who = data.get('who')
 
-        event = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
+        #event = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
         # event.create()
 
-        face_recognition_event = FaceRecognitionModelEvent(event_id = event.id, who=who)
+        #face_recognition_event = FaceRecognitionModelEvent(event_id = event.id, who=who)
         # face_recognition_event.create()
+        newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
+        db.session.add(newEvent)
+        db.session.commit()
 
-        # TODO think about returning more data or formatted stuff
         return jsonify({
             'success': True
         })
