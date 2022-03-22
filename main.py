@@ -42,6 +42,12 @@ class Event(db.Model):
     type = db.Column(db.Enum(EventType), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
+class FaceRecognitionModelEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    who = db.Column(db.String(50), nullable=False)
+    # TODO look into adding an image link that directs to AWS? - snapshot of the recognized face
+
 class Camera(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -63,6 +69,41 @@ def index():
     return render_template("cameras.html")
 
 # --------
+
+
+# API Endpoints
+# TODO integrate with our token-based security to lock down these endpoints as per best practices
+
+@app.route("/events/<int:user_id>", methods=["POST"])
+def update(user_id):
+
+    try:
+        user = Users.query.filter(Users.id == user_id).one_or_none()
+        if user is None:
+            abort(404)
+        
+        data = request.get_json()
+        user_id = data.get('user_id')
+        camera_id = data.get('camera_id')
+        # TODO add a check if camera id is in the list of already known database cameras, otherwise abort
+        event_type=data.get('event_type')
+        timestamp = data.get('timestamp')
+        who = data.get('who')
+
+        event = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
+        # event.create()
+
+        face_recognition_event = FaceRecognitionModelEvent(event_id = event.id, who=who)
+        # face_recognition_event.create()
+
+        # TODO think about returning more data or formatted stuff
+        return jsonify({
+            'success': True
+        })
+    except:
+        abort(422)
+
+# ------------
 
 
 @loginManager.user_loader
