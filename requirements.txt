@@ -11,3 +11,4 @@ email_validator
 flask_bootstrap
 boto3
 psycopg2-binary
+pytest
