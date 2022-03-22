@@ -95,7 +95,10 @@ def testAddCamera():
 @app.route("/")
 @login_required
 def home():
-    return render_template("home.html", name=current_user.name)
+    events = Event.query.order_by(Event.timestamp).limit(3).all()
+    for event in events:
+        event.type = event.type.value
+    return render_template("home.html", name=current_user.name, events=events)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
