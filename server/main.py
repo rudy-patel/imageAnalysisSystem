@@ -1,44 +1,62 @@
-from ast import Pass
-from crypt import methods
 from datetime import datetime
-# from db_classes.users import Users
-# from db_classes.event import Event
-# from db_classes.camera import Camera
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
-from flask import Flask, redirect, url_for, render_template, request, flash, Response
+from models.models import Users, Event, Camera
+from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, Response
 from flask_bootstrap import Bootstrap
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from Forms import LoginForm, SignUpForm
-from imutils import build_montages
 from os import environ
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-from importlib import import_module
-import argparse
 import boto3
 import cv2
-import imagezmq
-import imutils
-import numpy as np
-import os
-import time
+from importlib import import_module
 
-# Configuration and settings
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'imageanalysissystem'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
-
-Bootstrap(app)
-
-db = SQLAlchemy(app)
+bp = Blueprint('myapp', __name__)
 
 loginManager = LoginManager()
-loginManager.init_app(app)
-loginManager.login_view = 'login'
 
+def create_app():
+    app = Flask(__name__)
 
+    app.config['SECRET_KEY'] = 'imageanalysissystem'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
+
+    Bootstrap(app)
+
+    loginManager.init_app(app)
+    loginManager.login_view = 'myapp.login'
+
+    app.register_blueprint(bp)
+
+    from models.models import db
+    db.init_app(app)
+
+    return app
+    
+# EXAMPLE OF API ENDPOINT TIED TO SIMPLE-CLIENT
+@bp.route("/pi", methods=["GET", "POST"])
+def index():
+    notdata = 'test'
+    if(request.method == "POST"):
+        data = 'hello_world'
+        return jsonify({'data': data})
+    return redirect(url_for('myapp.cameras'))
+# --------
+
+@loginManager.user_loader
+def loadUser(id):
+    return Users.query.get(int(id))
+
+@bp.route("/test", methods=["GET", "POST"])
+def test():
+    getData = 'get_request'
+    postData = 'post_request'
+    if(request.method == "POST"):
+        return jsonify({'data': postData})
+    elif (request.method == "GET"):
+        return jsonify({'data': getData})
 
 #Generating funtion for video stream, produces frames from the PI one by one 
 def generate_frame(camera_stream):
@@ -52,7 +70,7 @@ def generate_frame(camera_stream):
 
 
 #Video stream, should be the soucre of the homepage video image
-@app.route('/video_feed')
+@bp.route('/video_feed')
 def video_feed():
 
     camera_stream = import_module('server_camera').Camera
@@ -62,67 +80,35 @@ def video_feed():
     resp.headers["Pragma"] = "no-cache"
     resp.headers["Expires"] = "0"
     return resp 
-    
 
-
-
-
-
-class Users(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(80), nullable=False)
-    events = db.relationship('Event', backref='users', lazy=True)
-    cameras = db.relationship('Camera', backref='users', lazy=True)
-
-class Event(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    camera_id = db.Column(db.Integer, db.ForeignKey('camera.id'), nullable=False)
-    type = db.Column(db.Enum(EventType), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
-
-class Camera(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    name = db.Column(db.String(50), nullable=False)
-    status = db.Column(db.Enum(CameraStatus), nullable=False)
-    mode = db.Column(db.Enum(CameraMode), nullable=False)
-    
-@loginManager.user_loader
-def loadUser(id):
-    return Users.query.get(int(id))
-
-@app.route("/addEvent")
+@bp.route("/addEvent")
 @login_required
 def testAddEvent():
     
-    newEvent = Event(user_id=current_user.id, camera_id=1, type=EventType.FACIAL_MATCH_SUCCESS, timestamp=datetime.now())
+    newEvent = Event(user_id=current_user.id, camera_id=1, type=EventType.IMAGE_CAPTURE_SUCCESS, timestamp=datetime.now())
 
-    db.session.add(newEvent)
-    db.session.commit()
+    newEvent.create()
 
-    return redirect(url_for('home'))
+    return redirect(url_for('myapp.home'))
 
-@app.route("/addCamera")
+@bp.route("/addCamera")
 @login_required
 def testAddCamera():
-    
     newCamera = Camera(user_id=current_user.id, name="Camera #" + str(current_user.id), status=CameraStatus.OFFLINE, mode=CameraMode.FACIAL_RECOGNITION)
+    newCamera.create()
 
-    db.session.add(newCamera)
-    db.session.commit()
-    
-    return redirect(url_for('home'))
+    return redirect(url_for('myapp.home'))
 
-@app.route("/home")
-@app.route("/")
+@bp.route("/home")
+@bp.route("/")
 @login_required
 def home():
-    return render_template("home.html", name=current_user.name)
+    events = Event.query.order_by(Event.timestamp.desc()).limit(3).all()
+    for event in events:
+        event.type = event.type.value
+    return render_template("home.html", name=current_user.name, events=events)
 
-@app.route("/login", methods=['GET', 'POST'])
+@bp.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
 
@@ -131,11 +117,11 @@ def login():
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user)
-                return redirect(url_for('home'))
+                return redirect(url_for('myapp.home'))
         flash("Invalid email/password")
     return render_template("login.html", form=form)
 
-@app.route("/signup", methods=['GET', 'POST'])
+@bp.route("/signup", methods=['GET', 'POST'])
 def signup():
     form = SignUpForm()
 
@@ -147,37 +133,42 @@ def signup():
         if not isUserExisting:
             newUser = Users(name=form.name.data, email= form.email.data, password=hashedPassword)
 
-            db.session.add(newUser)
-            db.session.commit()
+            newUser.create()
 
-            return redirect(url_for('login'))
+            return redirect(url_for('myapp.login'))
             
         flash("A user already exists with that email!")
     return render_template("signup.html", form=form)
 
-@app.route('/logout')
+@bp.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('myapp.login'))
 
-@app.route("/events")
+@bp.route("/events")
 @login_required
 def events():
-    return render_template("events.html")
+    events = Event.query.order_by(Event.timestamp.desc()).all()
+    for event in events:
+        event.type = event.type.value
+    return render_template("events.html", events=events)
 
-@app.route("/cameras")
+@bp.route("/cameras")
 @login_required
 def cameras():
-    return render_template("cameras.html")
+    cameras = Camera.query.order_by(Camera.status).all()
+    for camera in cameras:
+        camera.status = camera.status.value
+        camera.mode = camera.mode.value
+    return render_template("cameras.html", cameras=cameras)
 
-@app.route("/train")
+@bp.route("/train")
 @login_required
 def train():
     return render_template("train.html")
 
-
-@app.route("/train", methods=['POST'])
+@bp.route("/train", methods=['POST'])
 def upload_file():
     file = request.files['file']
     if file.filename != '':
@@ -186,9 +177,8 @@ def upload_file():
             output = send_to_s3(file, "lfiasimagestore")
             return str(output)
     else:
-        return redirect("/")
-    return redirect(url_for('train'))
-
+        return redirect("myapp.home")
+    return redirect(url_for('myapp.train'))
 
 def send_to_s3(file, bucket_name):
         session = boto3.Session(profile_name='default')
@@ -208,4 +198,5 @@ def send_to_s3(file, bucket_name):
         return "{} recieved {}".format("us-west-2", file.filename)
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", threaded=True, debug=True)
+    app = create_app()
+    app.run(debug=True)

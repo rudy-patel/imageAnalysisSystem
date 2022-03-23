@@ -36,3 +36,4 @@ Werkzeug==2.0.3
 WTForms==3.0.1
 imagezmq
 opencv-python
+pytest
