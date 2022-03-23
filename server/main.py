@@ -2,11 +2,7 @@ from datetime import datetime
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
 from models.models import Users, Event, Camera
-<<<<<<< HEAD:server/main.py
-from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, Response
-=======
-from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, abort
->>>>>>> b4db75af4a7a281c251f9302f87ea66cf84a46b5:main.py
+from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, Response, abort
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from Forms import LoginForm, SignUpForm
