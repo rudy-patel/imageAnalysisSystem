@@ -12,7 +12,6 @@ def test_new_user():
     assert user.name == name
     assert user.email == email
 
-
 def test_new_event():
     user_id = 1
     camera_id = 1
