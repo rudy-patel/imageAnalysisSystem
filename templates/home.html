@@ -32,34 +32,14 @@
             </div>
             <table class="table table-striped">
                 <tbody>
-                  <tr>
-                    <th scope="row"></th>
-                    <td>Motion Detected</td>
-                    <td>
-                        <button type="button" class="btn btn-primary">Go to Cameras</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row"></th>
-                    <td>Image Captured</td>
-                    <td>
-                        <button type="button" class="btn btn-primary">Go to Train</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row"></th>
-                    <td>Face Detected</td>
-                    <td>
-                        <button type="button" class="btn btn-primary">Go to Train</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row"></th>
-                    <td>Fault Detected</td>
-                    <td>
-                        <button type="button" class="btn btn-primary">Go to Train</button>
-                    </td>
-                  </tr>
+                    {% for event in events %}
+                    <tr>
+                      <td>{{event.type}}</td>
+                      <td>
+                          <button type="button" class="btn btn-primary">Go to Cameras</button>
+                      </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
               </table>
         </div>

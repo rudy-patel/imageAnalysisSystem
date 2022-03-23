@@ -1,5 +1,3 @@
-from ast import Pass
-from crypt import methods
 from datetime import datetime
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
@@ -129,7 +127,10 @@ def testAddCamera():
 @app.route("/")
 @login_required
 def home():
-    return render_template("home.html", name=current_user.name)
+    events = Event.query.order_by(Event.timestamp.desc()).limit(3).all()
+    for event in events:
+        event.type = event.type.value
+    return render_template("home.html", name=current_user.name, events=events)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -173,7 +174,7 @@ def logout():
 @app.route("/events")
 @login_required
 def events():
-    events = Event.query.order_by(Event.timestamp).all()
+    events = Event.query.order_by(Event.timestamp.desc()).all()
     for event in events:
         event.type = event.type.value
     return render_template("events.html", events=events)
