@@ -3,7 +3,7 @@ from crypt import methods
 from datetime import datetime
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
-from flask import Flask, redirect, url_for, render_template, request, jsonify, flash
+from flask import Flask, redirect, url_for, render_template, request, jsonify, flash, abort
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
@@ -68,42 +68,23 @@ class Camera(db.Model):
 # ------------
 
 
-# EXAMPLE OF API ENDPOINT TIED TO SIMPLE-CLIENT
-
-@app.route("/pi", methods=["GET", "POST"])
-def index():
-    notdata = 'test'
-    if(request.method == "POST"):
-        data = 'hello_world'
-        return jsonify({'data': data})
-    return render_template("cameras.html")
-
-# --------
-
-
 # API Endpoints
 # TODO integrate with our token-based security to lock down these endpoints as per best practices
 
-@app.route("/v1/events/<int:user_id>", methods=["POST"])
-def update(user_id):
+@app.route("/v1/events", methods=["POST"])
+def new_event():        
+    data = jsonify(request.form).json
+    user_id = data["user_id"]
+    camera_id = data["camera_id"]
+    event_type = data["event_type"]
+    timestamp = data["timestamp"]
+    #who = data.get('who')
 
+    #event = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
+    # event.create()
+    #face_recognition_event = FaceRecognitionModelEvent(event_id = event.id, who=who)
+    # face_recognition_event.create()
     try:
-        user = Users.query.filter(Users.id == user_id).one_or_none()
-        if user is None:
-            abort(404)
-        
-        data = request.get_json()
-        camera_id = data.get('camera_id')
-        # TODO add a check if camera id is in the list of already known database cameras, otherwise abort
-        event_type=data.get('event_type')
-        timestamp = data.get('timestamp')
-        #who = data.get('who')
-
-        #event = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
-        # event.create()
-
-        #face_recognition_event = FaceRecognitionModelEvent(event_id = event.id, who=who)
-        # face_recognition_event.create()
         newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
         db.session.add(newEvent)
         db.session.commit()
@@ -111,6 +92,7 @@ def update(user_id):
         return jsonify({
             'success': True
         })
+
     except:
         abort(422)
 
