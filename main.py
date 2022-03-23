@@ -47,7 +47,6 @@ def new_event():
     try:
         newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
         newEvent.create()
-
         return jsonify({
             'success': True
         })
