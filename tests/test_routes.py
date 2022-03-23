@@ -1,9 +1,5 @@
 from flask import json
 
-def test_pi(client):
-    response = client.post("/pi")
-    data = json.loads(response.get_data(as_text=True))
-    assert data['data'] == 'hello_world'
 
 def test_test_post(client):
     response = client.post("/test")

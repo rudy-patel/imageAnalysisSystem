@@ -43,12 +43,7 @@ def new_event():
     camera_id = data["camera_id"]
     event_type = data["event_type"]
     timestamp = data["timestamp"]
-    #who = data.get('who')
 
-    #event = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
-    # event.create()
-    #face_recognition_event = FaceRecognitionModelEvent(event_id = event.id, who=who)
-    # face_recognition_event.create()
     try:
         newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
         newEvent.create()
@@ -61,16 +56,6 @@ def new_event():
         abort(422)
 
 # ------------
-    
-# EXAMPLE OF API ENDPOINT TIED TO SIMPLE-CLIENT
-@bp.route("/pi", methods=["GET", "POST"])
-def index():
-    notdata = 'test'
-    if(request.method == "POST"):
-        data = 'hello_world'
-        return jsonify({'data': data})
-    return redirect(url_for('myapp.cameras'))
-# --------
 
 @loginManager.user_loader
 def loadUser(id):
