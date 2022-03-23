@@ -2,7 +2,7 @@ from datetime import datetime
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
 from models.models import Users, Event, Camera
-from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash
+from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, abort
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from Forms import LoginForm, SignUpForm
@@ -32,16 +32,29 @@ def create_app():
     db.init_app(app)
 
     return app
-    
-# EXAMPLE OF API ENDPOINT TIED TO SIMPLE-CLIENT
-@bp.route("/pi", methods=["GET", "POST"])
-def index():
-    notdata = 'test'
-    if(request.method == "POST"):
-        data = 'hello_world'
-        return jsonify({'data': data})
-    return redirect(url_for('myapp.cameras'))
-# --------
+  
+ # API Endpoints
+# TODO integrate with our token-based security to lock down these endpoints as per best practices
+
+@bp.route("/v1/events", methods=["POST"])
+def new_event():        
+    data = jsonify(request.form).json
+    user_id = data["user_id"]
+    camera_id = data["camera_id"]
+    event_type = data["event_type"]
+    timestamp = data["timestamp"]
+
+    try:
+        newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
+        newEvent.create()
+        return jsonify({
+            'success': True
+        })
+
+    except:
+        abort(422)
+
+# ------------
 
 @loginManager.user_loader
 def loadUser(id):
