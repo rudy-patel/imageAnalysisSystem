@@ -9,8 +9,12 @@
             <div class="row">
                 <!-- 16:9 aspect ratio -->
                 <div class="embed-responsive embed-responsive-4by3">
-                    <img src="{{ url_for('video_feed') }}"  style="border:1px solid black;width:100%" alt="Camera stream 1">
+                    <img src="{{ url_for('video_feed') }}" alt="Camera stream 1" id = "camera_stream">
                 </div>
+                <!-- Script performs a cache break on the camera stream element every 50ms-->
+                <script>let handle = setInterval( () => {
+                                        document.getElementById("camera_stream").src = "/video_feed#" + Date.now()
+                                        }, 40)</script>
             </div>
             <div class="row justify-content-center">
                 <div class="col">Facial recognition</div>

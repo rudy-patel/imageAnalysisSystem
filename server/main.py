@@ -6,7 +6,8 @@ from datetime import datetime
 # from db_classes.camera import Camera
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
-from flask import Flask, redirect, url_for, render_template, request, flash, Response
+from flask import Flask, redirect, url_for, render_template, request, flash, Response, session
+from flask_session import Session 
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
@@ -24,6 +25,7 @@ import imutils
 import numpy as np
 import os
 import time
+import datetime
 
 # Configuration and settings
 app = Flask(__name__)
@@ -48,7 +50,6 @@ def generate_frame(camera_stream):
     #    cam_id, frame = camera_stream.get_frame()
     #    if frame is None:
     #        break
-    print("Generating frame")
     cam_id, frame = camera_stream.get_frame()
     # Write the camera name
     #cv2.putText(frame, cam_id, (int(20), int(20 * 5e-3 * frame.shape[0])), 0, 2e-3 * frame.shape[0], (255, 255, 255), 2)
@@ -58,13 +59,17 @@ def generate_frame(camera_stream):
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 
+
 #Video stream, should be the soucre of the homepage video image
 @app.route('/video_feed')
 def video_feed():
 
     camera_stream = import_module('server_camera').Camera
-    return Response(generate_frame(camera_stream=camera_stream()),
+    resp = Response(generate_frame(camera_stream=camera_stream()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+    resp.headers["Cache-Control"] = "no-cache"
+    return resp 
+    
 
 
 

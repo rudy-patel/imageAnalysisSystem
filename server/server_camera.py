@@ -1,6 +1,7 @@
 import imagezmq
 import threading
-import time 
+import time
+
 
 
 
@@ -36,7 +37,7 @@ class CameraEvent:
                 # did not process a previous frame
                 # if the event stays set for more than 5 seconds, then assume
                 # the client is gone and remove it
-                if now - event[1] > 5:
+                if now - event[1] > 10:
                     remove = ident
         if remove:
             del self.events[remove]
@@ -46,17 +47,21 @@ class CameraEvent:
         self.events[threading.get_ident()][0].clear()
 
 
-
+#
 class Camera():
 
     frame = None
     event = None
     last_access = None
     thread = None
+    instance = None
 
 
     def __init__(self):
-
+        
+        if Camera.thread:
+            return
+            
         #self.unique_name = (feed_type, device)
         Camera.event = CameraEvent()
         Camera.last_access = time.time()
@@ -84,23 +89,13 @@ class Camera():
         return Camera.frame
 
 
-    #calls imagehub.recv_image and returns a frame/ multiple frames????
+    #calls imagehub.recv_image and returns a frame
     @classmethod
-    def frames(cls, image_hub):
-        #num_frames = 0
-        #total_time = 0
-
-        #time_start = time.time()
+    def collect_frame(cls, image_hub):
 
         print("Attempting to receive image")
         cam_id, frame = image_hub.recv_image()
         image_hub.send_reply(b'OK')  # this is needed for the stream to work with REQ/REP pattern
-
-        #num_frames += 1
-
-        #time_now = time.time()
-        #total_time += time_now - time_start
-        #fps = num_frames / total_time
 
         # uncomment below to see FPS of camera stream
         # cv2.putText(frame, "FPS: %.2f" % fps, (int(20), int(40 * 5e-3 * frame.shape[0])), 0, 2e-3 * frame.shape[0],(255, 255, 255), 2)
@@ -110,14 +105,14 @@ class Camera():
 
 
 
-    #Thread function, collects frames from the specified IP/port
+    #Thread function, collects frames from the specified port
     def _thread(cls):
     
         port = 5555
         image_hub = imagezmq.ImageHub(open_port='tcp://*:{}'.format(port))
         print("Opened image hub, waiting for frames")
         while True:
-            new_frame = cls.frames(image_hub)
+            new_frame = cls.collect_frame(image_hub)
             try:
                 #print("New frame set")
                 Camera.frame = new_frame
