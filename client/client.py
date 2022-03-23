@@ -16,8 +16,8 @@ ip = "127.0.0.1"
 sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, port))
 
 # Get the host name, initialize the video stream
-#camera_id = socket.gethostname()
-#vs = VideoStream(usePiCamera=True).start()
+camera_id = socket.gethostname()
+vs = VideoStream(usePiCamera=True).start()
 
 # Any USB camera can be used if this line is used instead
 # vs = VideoStream(src=0).start()
@@ -36,8 +36,10 @@ time.sleep(2.0)
 
 while True:
 	# Read the frame from the camera, send it to the server
-	#frame = vs.read()
+	frame = vs.read()
 	
-	frame = cv2.imread("happy.jpg")
-	print("sending smile")
-	sender.send_image("test", frame)
+	
+	
+	sender.send_image(camera_id, frame)
+	#Frame rate throttle
+	time.sleep(0.1)

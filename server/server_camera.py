@@ -93,7 +93,7 @@ class Camera():
     @classmethod
     def collect_frame(cls, image_hub):
 
-        print("Attempting to receive image")
+        #print("Attempting to receive image")
         cam_id, frame = image_hub.recv_image()
         image_hub.send_reply(b'OK')  # this is needed for the stream to work with REQ/REP pattern
 
@@ -114,7 +114,7 @@ class Camera():
         while True:
             new_frame = cls.collect_frame(image_hub)
             try:
-                #print("New frame set")
+                print("New frame set")
                 Camera.frame = new_frame
                 Camera.event.set()
 

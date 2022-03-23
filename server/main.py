@@ -6,8 +6,7 @@ from datetime import datetime
 # from db_classes.camera import Camera
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
-from flask import Flask, redirect, url_for, render_template, request, flash, Response, session
-from flask_session import Session 
+from flask import Flask, redirect, url_for, render_template, request, flash, Response
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
@@ -44,12 +43,7 @@ loginManager.login_view = 'login'
 
 #Generating funtion for video stream, produces frames from the PI one by one 
 def generate_frame(camera_stream):
-    #unique_name = (feed_type, device)
 
-    #while True:
-    #    cam_id, frame = camera_stream.get_frame()
-    #    if frame is None:
-    #        break
     cam_id, frame = camera_stream.get_frame()
     # Write the camera name
     #cv2.putText(frame, cam_id, (int(20), int(20 * 5e-3 * frame.shape[0])), 0, 2e-3 * frame.shape[0], (255, 255, 255), 2)
@@ -67,7 +61,9 @@ def video_feed():
     camera_stream = import_module('server_camera').Camera
     resp = Response(generate_frame(camera_stream=camera_stream()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
-    resp.headers["Cache-Control"] = "no-cache"
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
     return resp 
     
 

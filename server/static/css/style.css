@@ -82,3 +82,16 @@
   .slider.round:before {
     border-radius: 50%;
   } 
+  
+  .stream_container {
+    width: 80%;
+    height: 400px;
+
+  }
+  
+  .stream {
+    width: 80%;
+    height: 80%;
+    border: 2px solid black;
+    
+  }
