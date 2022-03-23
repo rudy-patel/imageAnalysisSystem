@@ -24,7 +24,6 @@ import imutils
 import numpy as np
 import os
 import time
-import datetime
 
 # Configuration and settings
 app = Flask(__name__)
@@ -45,8 +44,6 @@ loginManager.login_view = 'login'
 def generate_frame(camera_stream):
 
     cam_id, frame = camera_stream.get_frame()
-    # Write the camera name
-    #cv2.putText(frame, cam_id, (int(20), int(20 * 5e-3 * frame.shape[0])), 0, 2e-3 * frame.shape[0], (255, 255, 255), 2)
 
     frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
     return (b'--frame\r\n'

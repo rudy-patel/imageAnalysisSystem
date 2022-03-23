@@ -1,14 +1,10 @@
+#made with the help of https://gitee.com/huzhuhua/Flask-Multi-Camera-Streaming-With-YOLOv4-and-Deep-SORT/tree/master
 import imagezmq
 import threading
 import time
 
 
-
-
-
-
-
-#Event like class to signla clients when frames are available 
+#Event like class to signal clients when frames are available 
 class CameraEvent:
     def __init__(self):
         self.events = {}
@@ -47,7 +43,7 @@ class CameraEvent:
         self.events[threading.get_ident()][0].clear()
 
 
-#
+#Server side camera, starts a thread to collect frames from the client 
 class Camera():
 
     frame = None
@@ -60,13 +56,12 @@ class Camera():
     def __init__(self):
         
         if Camera.thread:
-            return
-            
-        #self.unique_name = (feed_type, device)
+            return          
+
         Camera.event = CameraEvent()
         Camera.last_access = time.time()
 
-        # start background frame thread
+        # start frame collection thread
         Camera.thread = threading.Thread(target=self._thread)
         Camera.thread.start()
         print("Streaming thread started")
@@ -76,10 +71,10 @@ class Camera():
             time.sleep(0)
 
 
-
     #Returns the current camera frame
     @classmethod
     def get_frame(cls):
+        #It is possible to use last_access to setup a timeout for the thread
         #Camera.last_access = time.time()
 
         # wait for a signal from the camera thread
@@ -92,17 +87,10 @@ class Camera():
     #calls imagehub.recv_image and returns a frame
     @classmethod
     def collect_frame(cls, image_hub):
-
-        #print("Attempting to receive image")
         cam_id, frame = image_hub.recv_image()
         image_hub.send_reply(b'OK')  # this is needed for the stream to work with REQ/REP pattern
 
-        # uncomment below to see FPS of camera stream
-        # cv2.putText(frame, "FPS: %.2f" % fps, (int(20), int(40 * 5e-3 * frame.shape[0])), 0, 2e-3 * frame.shape[0],(255, 255, 255), 2)
-
         return cam_id, frame
-
-
 
 
     #Thread function, collects frames from the specified port
@@ -119,10 +107,7 @@ class Camera():
                 Camera.event.set()
 
             except Exception as e:
-                #frames_iterator.close()
                 image_hub.zmq_socket.close()
                 print('Closing server socket at port {}.'.format(port))
                 print('Stopping server thread for device due to error.')
                 print(e)
-
-
