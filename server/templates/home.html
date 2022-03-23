@@ -9,7 +9,7 @@
             <div class="row">
                 <!-- 16:9 aspect ratio -->
                 <div class="stream_container">
-                    <img src="{{ url_for('video_feed') }}" class="stream" id = "camera_stream">
+                    <img src="{{ url_for('myapp.video_feed') }}" class="stream" id = "camera_stream">
                 </div>
                 <!-- Script performs a cache break on the camera stream element every 50ms-->
                 <script>let handle = setInterval( () => {
