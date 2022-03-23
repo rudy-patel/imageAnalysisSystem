@@ -93,7 +93,7 @@ def testAddCamera():
 @app.route("/")
 @login_required
 def home():
-    events = Event.query.order_by(Event.timestamp).limit(3).all()
+    events = Event.query.order_by(Event.timestamp.desc()).limit(3).all()
     for event in events:
         event.type = event.type.value
     return render_template("home.html", name=current_user.name, events=events)
@@ -140,7 +140,7 @@ def logout():
 @app.route("/events")
 @login_required
 def events():
-    events = Event.query.order_by(Event.timestamp).all()
+    events = Event.query.order_by(Event.timestamp.desc()).all()
     for event in events:
         event.type = event.type.value
     return render_template("events.html", events=events)
