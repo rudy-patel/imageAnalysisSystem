@@ -51,8 +51,7 @@ def new_event():
     # face_recognition_event.create()
     try:
         newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
-        db.session.add(newEvent)
-        db.session.commit()
+        newEvent.create()
 
         return jsonify({
             'success': True
