@@ -3,7 +3,7 @@ import pytest
 from flask import template_rendered
 import sys
 sys.path.append("..\server")
-from server.main import create_app
+from .main import create_app
 
 
 
