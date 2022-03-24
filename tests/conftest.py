@@ -1,9 +1,7 @@
 import flask
 import pytest
 from flask import template_rendered
-import sys
-sys.path.append("..\server")
-from .main import create_app
+from server.main import create_app
 
 
 

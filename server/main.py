@@ -5,7 +5,7 @@ from server.models.models import Users, Event, Camera
 from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, Response, abort
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from Forms import LoginForm, SignUpForm
+from server.Forms import LoginForm, SignUpForm
 from os import environ
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -30,7 +30,7 @@ def create_app():
 
     app.register_blueprint(bp)
 
-    from models.models import db
+    from server.models.models import db
     db.init_app(app)
 
     return app
