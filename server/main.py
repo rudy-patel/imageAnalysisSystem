@@ -39,11 +39,32 @@ def create_app():
  # API Endpoints
 # TODO integrate with our token-based security to lock down these endpoints as per best practices
 
+# This is a generic example that posts a new event
 @bp.route("/v1/events", methods=["POST"])
 def new_event():        
     data = jsonify(request.form).json
     user_id = data["user_id"]
     camera_id = data["camera_id"]
+    event_type = data["event_type"]
+    timestamp = data["timestamp"]
+
+    try:
+        newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
+        newEvent.create()
+        return jsonify({
+            'success': True
+        })
+
+    except:
+        abort(422)
+
+# This is for posting a new facial recognition
+@bp.route("/v1/<int:user_id>/<int:camera_id>/facialdetectionevent", methods=["POST"])
+def new_event():        
+    data = jsonify(request.form).json
+    # user_id = data["user_id"]
+    # camera_id = data["camera_id"]
+    name = data["name"]
     event_type = data["event_type"]
     timestamp = data["timestamp"]
 
