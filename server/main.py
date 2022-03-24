@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import boto3
 import cv2
+from server import server_camera
 from importlib import import_module
 
 bp = Blueprint('myapp', __name__)
@@ -86,7 +87,8 @@ def generate_frame(camera_stream):
 @bp.route('/video_feed')
 def video_feed():
 
-    camera_stream = import_module('server_camera').Camera
+    camera_stream = server_camera.Camera
+
     resp = Response(generate_frame(camera_stream=camera_stream()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
     resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
