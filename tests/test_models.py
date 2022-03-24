@@ -1,6 +1,6 @@
-from main import Users, Event, Camera
-from enums.cameraEnums import CameraMode, CameraStatus
-from enums.eventEnums import EventType
+from server.main import Users, Event, Camera
+from server.enums.cameraEnums import CameraMode, CameraStatus
+from server.enums.eventEnums import EventType
 import datetime
 
 def test_new_user():

@@ -1,7 +1,9 @@
 import flask
 import pytest
 from flask import template_rendered
-from main import create_app
+from server.main import create_app
+
+
 
 @pytest.fixture()
 def app():

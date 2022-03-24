@@ -1,15 +1,18 @@
 from datetime import datetime
-from enums.cameraEnums import CameraMode, CameraStatus
-from enums.eventEnums import EventType
-from models.models import Users, Event, Camera
-from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, abort
+from server.enums.cameraEnums import CameraMode, CameraStatus
+from server.enums.eventEnums import EventType
+from server.models.models import Users, Event, Camera
+from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, Response, abort
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from Forms import LoginForm, SignUpForm
+from server.Forms import LoginForm, SignUpForm
 from os import environ
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import boto3
+import cv2
+from server import server_camera
+from importlib import import_module
 
 bp = Blueprint('myapp', __name__)
 
@@ -28,7 +31,7 @@ def create_app():
 
     app.register_blueprint(bp)
 
-    from models.models import db
+    from server.models.models import db
     db.init_app(app)
 
     return app
@@ -68,6 +71,30 @@ def test():
         return jsonify({'data': postData})
     elif (request.method == "GET"):
         return jsonify({'data': getData})
+
+#Generating funtion for video stream, produces frames from the PI one by one 
+def generate_frame(camera_stream):
+
+    cam_id, frame = camera_stream.get_frame()
+
+    frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
+    return (b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+
+#Video stream, should be the soucre of the homepage video image
+@bp.route('/video_feed')
+def video_feed():
+
+    camera_stream = server_camera.Camera
+
+    resp = Response(generate_frame(camera_stream=camera_stream()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp 
 
 @bp.route("/addEvent")
 @login_required

@@ -1,7 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from enums.cameraEnums import CameraMode, CameraStatus
-from enums.eventEnums import EventType
+import sys
+sys.path.append("..\server")
+from server.enums.cameraEnums import CameraMode, CameraStatus
+from server.enums.eventEnums import EventType
 
 db = SQLAlchemy()
 
