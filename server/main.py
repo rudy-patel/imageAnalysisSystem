@@ -1,6 +1,6 @@
 from datetime import datetime
-from enums.cameraEnums import CameraMode, CameraStatus
-from enums.eventEnums import EventType
+from cameraEnums import CameraMode, CameraStatus
+from eventEnums import EventType
 from models.models import Users, Event, Camera
 from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, Response, abort
 from flask_bootstrap import Bootstrap
