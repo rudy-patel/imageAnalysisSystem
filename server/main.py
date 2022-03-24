@@ -59,18 +59,19 @@ def new_event():
         abort(422)
 
 # This is for posting a new facial recognition
-@bp.route("/v1/<int:user_id>/<int:camera_id>/facialdetectionevent", methods=["POST"])
-def new_event():        
+@bp.route("/v1/<int:camera_id>/facial-detection-event", methods=["POST"])
+def face_detected():
     data = jsonify(request.form).json
-    # user_id = data["user_id"]
-    # camera_id = data["camera_id"]
+    user_id = data["user_id"]
     name = data["name"]
     event_type = data["event_type"]
     timestamp = data["timestamp"]
+    image_link = data["image_link"]
 
     try:
-        newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
+        newEvent = Event(user_id=user_id, camera_id=camera_id, name=name, type=event_type, timestamp=timestamp, image_link=image_link)
         newEvent.create()
+        
         return jsonify({
             'success': True
         })
