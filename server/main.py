@@ -13,8 +13,10 @@ import boto3
 import cv2
 from server import server_camera
 from importlib import import_module
+from flask_migrate import Migrate
 
 bp = Blueprint('myapp', __name__)
+migrate = Migrate()
 
 loginManager = LoginManager()
 
@@ -33,6 +35,7 @@ def create_app():
 
     from server.models.models import db
     db.init_app(app)
+    migrate.init_app(app, db)
 
     return app
   
@@ -49,7 +52,7 @@ def new_event():
     timestamp = data["timestamp"]
 
     try:
-        newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
+        newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp, name = "yo", image_link="bro")
         newEvent.create()
         return jsonify({
             'success': True
