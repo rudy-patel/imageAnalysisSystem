@@ -1,7 +1,7 @@
 from datetime import datetime
 from server.enums.cameraEnums import CameraMode, CameraStatus
 from server.enums.eventEnums import EventType
-from models.models import Users, Event, Camera
+from server.models.models import Users, Event, Camera
 from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, Response, abort
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
