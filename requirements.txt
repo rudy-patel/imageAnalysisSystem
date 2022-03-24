@@ -5,7 +5,6 @@ certifi==2021.10.8
 charset-normalizer==2.0.12
 click==8.0.3
 cmake==3.22.3
-dlib==19.23.1
 dnspython==2.2.1
 dominate==2.6.0
 email-validator==1.1.3
