@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+import sys
+sys.path.append("..\server")
 from enums.cameraEnums import CameraMode, CameraStatus
 from enums.eventEnums import EventType
 
