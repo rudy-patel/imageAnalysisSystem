@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 <body>
   <div class="container">
@@ -9,7 +10,8 @@
 
   <form class="form-uploadImage" method="POST" action ="/train" enctype="multipart/form-data">
     <div class="form-group">
-      <p><input type="file" name="file"></p>
+      {{ form.hidden_tag() }}
+      {{ wtf.form_field(form.file) }}
       
       <label for="personSelect2">Select a person</label>
       <select multiple class="form-control" id="personSelect2">
