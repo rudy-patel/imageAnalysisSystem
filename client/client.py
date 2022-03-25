@@ -77,8 +77,8 @@ class Client():
         file = {
             "image": ("filename", open(filename, "rb"), 'image/jpg')
         }
-        requests.post("localhost/v1/camera_id/facial-detection-event", files=file, data=data)
-        
+        requests.post("https://127.0.0.1:5000/v1/" + self.camera_id + "/facial-detection-event", files=file, data=data)
+
         #Delete temp file
         os.remove(filename)
         #Set new timeout
