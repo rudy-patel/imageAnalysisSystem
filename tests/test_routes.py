@@ -15,7 +15,7 @@ def test_test_get(client):
 def test_event(test_client):
     """Test the endpoint for posting events"""
     input_data = { 
-        "user_id": 4,
+        "user_id": 5,
         "camera_id": 2,
         "event_type": "IMAGE_CAPTURE_FAILED",
         "timestamp": datetime.date(2022, 4, 4)
