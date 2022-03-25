@@ -8,102 +8,157 @@ import socket
 import time
 import cv2
 import pickle
+import requests
+import random
+import string
+import os
+from datetime import datetime
+from collections import defaultdict
 
-def facial_req(frame, data):
-    currentname = "unknown"
-    frame = imutils.resize(frame, width=500)
-    # Detect the fce boxes
-    boxes = face_recognition.face_locations(frame)
-    # compute the facial embeddings for each face bounding box
-    encodings = face_recognition.face_encodings(frame, boxes)
-    names = []
+class Client():
 
-    # loop over the facial embeddings
-    for encoding in encodings:
-        # attempt to match each face in the input image to our known
-        # encodings
-        matches = face_recognition.compare_faces(data["encodings"],
-            encoding)
-        name = "Unknown" #if face is not recognized, then print Unknown
+    def __init__(self, ip, port):
+        self.port = port
+        self.ip = ip
+        #For now, 1 = facial detection and 0 = fault detection
+        self.facial_mode = True 
+        self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, port))
+        #ON CONFIG the camera will get its ID and asscoiated user
+        self.camera_id = 1
+        self.name = socket.gethostname()
+        self.vs = VideoStream(usePiCamera=True).start()
+        self.encode_data = pickle.loads(open("encodings.pickle", "rb").read())
+        self.timeouts = defaultdict(int)
+        self.timeout_duration = 60
+        self.location = "/home/pi/imageAnalysisSystem/client"
+        #Camera warmup sleep
+        time.sleep(2.0)
 
-        # check to see if we have found a match
-        if True in matches:
-            # find the indexes of all matched faces then initialize a
-            # dictionary to count the total number of times each face
-            # was matched
-            matchedIdxs = [i for (i, b) in enumerate(matches) if b]
-            counts = {}
 
-            # loop over the matched indexes and maintain a count for
-            # each recognized face face
-            for i in matchedIdxs:
-                name = data["names"][i]
-                counts[name] = counts.get(name, 0) + 1
+    def run(self):
+        #Main loop
+        while True:
+            #Check for heartbeat/configure
+            frame = self.vs.read()
+            if self.facial_mode:
+                frame = self.facial_req(frame, self.encode_data)
+            else:
+                #Fault detection here
+                pass
+            self.sender.send_image(self.camera_id, frame)
 
-            # determine the recognized face with the largest number
-            # of votes (note: in the event of an unlikely tie Python
-            # will select first entry in the dictionary)
-            name = max(counts, key=counts.get)
 
-            #If someone in your dataset is identified, print their name on the screen
-            if currentname != name:
-                currentname = name
-                print(currentname)
+    #Send a POST request to the server event route
+    def facial_req_event(self, name, frame):
+        stamp = int(time.time())
+        #Check timeout
+        if stamp - self.timeouts[name] < self.timeout_duration:
+            return
+        #Convert to jpg and save temp file
+        #10 digit random string with very low collision probability
+        rand_string = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        filename = "face-" + name + "_" + rand_string + ".jpg"
+        cv2.imwrite(filename, frame)
 
-        # update the list of names
-        names.append(name)
+        #Build post and send request
+        data = {
+            "user_id": 4,
+            "name": name,
+            "event_type": "FACIAL_MATCH_SUCCESS",
+            "timestamp": datetime.now(), #Stamp may need to be reformatted
+            }
 
-    # loop over the recognized faces
-    for ((top, right, bottom, left), name) in zip(boxes, names):
-        # draw the predicted face name on the image - color is in BGR
-        cv2.rectangle(frame, (left, top), (right, bottom),
-            (0, 255, 225), 2)
-        y = top - 15 if top - 15 > 15 else top + 15
-        cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX,
-            .8, (0, 255, 255), 2)
+        file = {
+            "image": (filename, open(filename, "rb"), 'image/jpg')
+        }
 
-    # display the image to our screen
-    return frame
-# Argument parser
-#ap = argparse.ArgumentParser()
-#ap.add_argument("-s", "--server-ip", required=True, help="IP address of the server this client connects to")
-#ap.add_argument("-s", "--port-number", required=True, help="Port of the server this client connects to (NOTE 5555, 5556)")
-#args = vars(ap.parse_args())
-# Initialize ImageSender object with the socket address of the server thread
-port = "5555"
-ip = "127.0.0.1"
-sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, port))
+        print("Sending request, Name: " + name)
+        requests.post("http://127.0.0.1:5000/v1/"+ str(self.camera_id) + "/facial-detection-event", files=file, data=data)
+        
+        #Delete temp file
+        path = os.path.join(self.location, filename)
+        os.remove(path)
+        #Set new timeout
+        self.timeouts[name] = stamp
 
-# Get the host name, initialize the video stream
-camera_id = socket.gethostname()
-vs = VideoStream(usePiCamera=True).start()
-# vs = VideoStream(usePiCamera=True, resolution=(xx, yy)).start()
 
-# Allow the camera sensor time to warm up
-time.sleep(2.0)
-#Initialize 'currentname' to trigger only when a new person is identified.
-currentname = "unknown"
-#Determine faces from encodings.pickle file model created from train_model.py
-encodingsP = "encodings.pickle"
+    def update_encodings(self):
+        self.data = pickle.loads(open("encodings.pickle", "rb").read())
 
-# load the known faces and embeddings along with OpenCV's Haar
-# cascade for face detection
-print("[INFO] loading encodings + face detector...")
-data = pickle.loads(open(encodingsP, "rb").read())
 
-while True:
-    # Read the frame from the camera, perform facial req, send it to the server
-    frame = vs.read()
-    
-    rec_frame = facial_req(frame, data)
-    
-    sender.send_image(camera_id, rec_frame)
-    #Frame rate throttle
-    time.sleep(0.1)
-    
-    
+    #takes a frame and returns a cv2 facial req boxed frame
+    def facial_req(self, frame, data):
+        match = False
+        currentname = "Unknown"
+        frame = imutils.resize(frame, width=500)
+        # Detect the fce boxes
+        boxes = face_recognition.face_locations(frame)
 
-    
+        if boxes:
+            #AT LEAST ONE FACE WAS FOUND
+            match = True
+        # compute the facial embeddings for each face bounding box
+        encodings = face_recognition.face_encodings(frame, boxes)
+        names = []
+        # loop over the facial embeddings
+        for encoding in encodings:
+            # attempt to match each face in the input image to our known
+            # encodings
+            matches = face_recognition.compare_faces(data["encodings"],
+                encoding)
+            name = "Unknown" #if face is not recognized, then print Unknown
+
+            # check to see if we have found a match
+            if True in matches:
+                
+                # find the indexes of all matched faces then initialize a
+                # dictionary to count the total number of times each face
+                # was matched
+                matchedIdxs = [i for (i, b) in enumerate(matches) if b]
+                counts = {}
+
+                # loop over the matched indexes and maintain a count for
+                # each recognized face
+                for i in matchedIdxs:
+                    name = data["names"][i]
+                    counts[name] = counts.get(name, 0) + 1
+
+                # determine the recognized face with the largest number
+                # of votes (note: in the event of an unlikely tie Python
+                # will select first entry in the dictionary)
+                name = max(counts, key=counts.get)
+
+                #If someone in your dataset is identified, print their name on the screen
+                if currentname != name:
+                    currentname = name
+                    print(currentname)
+
+            # update the list of names
+            names.append(name)
+        # loop over the recognized faces
+        for ((top, right, bottom, left), name) in zip(boxes, names):
+            # draw the predicted face name on the image - color is in BGR
+            cv2.rectangle(frame, (left, top), (right, bottom),
+                (0, 255, 225), 2)
+            y = top - 15 if top - 15 > 15 else top + 15
+            cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX,
+                .8, (0, 255, 255), 2)
+        if match:
+            self.facial_req_event(names[0], frame)
+        # display the image to our screen
+        return frame
+
+
+def main():
+
+    client = Client("127.0.0.1", "5555")
+    client.run()
+
+
+if __name__ == "__main__":
+    main()   
+
+
     
     
     
