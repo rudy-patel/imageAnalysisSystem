@@ -178,22 +178,20 @@ def cameras():
         camera.mode = camera.mode.value
     return render_template("cameras.html", cameras=cameras)
 
-@bp.route("/train")
+@bp.route("/train", methods=['GET', 'POST'])
 @login_required
 def train():
+    if request.method == "POST":
+        file = request.files['file']
+        if file.filename != '':
+            if file:
+                file.filename = secure_filename(file.filename)
+                output = send_to_s3(file, "lfiasimagestore")
+                return str(output)
+        else:
+            return redirect("myapp.home")
+    
     return render_template("train.html")
-
-@bp.route("/train", methods=['POST'])
-def upload_file():
-    file = request.files['file']
-    if file.filename != '':
-        if file:
-            file.filename = secure_filename(file.filename)
-            output = send_to_s3(file, "lfiasimagestore")
-            return str(output)
-    else:
-        return redirect("myapp.home")
-    return redirect(url_for('myapp.train'))
 
 def send_to_s3(file, bucket_name):
         session = boto3.Session(profile_name='default')
@@ -204,7 +202,7 @@ def send_to_s3(file, bucket_name):
                 bucket_name,
                 file.filename,
                 ExtraArgs={
-                    "ContentType": file.content_type    #Set appropriate content type as per the file
+                    "ContentType": file.content_type #Set appropriate content type as per the file
                 }
             )
         except Exception as e:
