@@ -9,7 +9,7 @@ testid = 2
 test_obj = {
     "user_id": 4,
     "name": "Jacob",
-    "event_type": "Face recognized",
+    "event_type": "FACIAL_MATCH_SUCCESS",
     "timestamp": a
     }
 

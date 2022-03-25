@@ -87,7 +87,8 @@ def face_detected(camera_id):
             'success': True
         })
 
-    except:
+    except Exception as e:
+        print(e)
         abort(422)
 
 # ------------
@@ -243,7 +244,7 @@ def send_to_s3(file, bucket_name):
         except Exception as e:
             print("Something Happened: ", e)
             return e
-        return "{} recieved {}".format("us-west-2", file.filename)
+        return "https://lfiasimagestore.s3.us-west-2.amazonaws.com/{}".format(file.filename)
 
 if __name__ == "__main__":
     app = create_app()
