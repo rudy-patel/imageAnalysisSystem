@@ -83,7 +83,9 @@ class Client():
         requests.post("http://127.0.0.1:5000/v1/"+ str(self.camera_id) + "/facial-detection-event", files=file, data=data)
         
         #Delete temp file
-        os.remove(filename)
+        location = "/home/pi/imageAnalysisSystem/client"
+        path = os.path.join(location, filename)
+        os.remove(path)
         #Set new timeout
         self.timeouts[name] = stamp
 
