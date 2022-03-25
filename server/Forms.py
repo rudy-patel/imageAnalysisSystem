@@ -25,5 +25,5 @@ class SignUpForm(FlaskForm):
 class TrainingForm(FlaskForm):
     file = FileField('image', validators=[
         FileRequired(),
-        FileAllowed(['jpg', 'png', 'heic'], 'Images only!')
+        FileAllowed(['jpg', 'jpeg'], 'Allowed file formats: .jpg, .jpeg!')
     ])

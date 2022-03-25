@@ -188,7 +188,8 @@ def train():
             if form.file:
                 form.file.data.filename = secure_filename(form.file.data.filename)
                 output = send_to_s3(form.file.data, "lfiasimagestore")
-                return str(output)
+                flash(str(output))
+                return redirect(url_for('myapp.train'))
         else:
             return redirect("myapp.home")
     
@@ -209,7 +210,7 @@ def send_to_s3(file, bucket_name):
         except Exception as e:
             print("Something Happened: ", e)
             return e
-        return "{} recieved {}".format("us-west-2", file.filename)
+        return "{} recieved {} successfully!".format("us-west-2", file.filename)
 
 if __name__ == "__main__":
     app = create_app()
