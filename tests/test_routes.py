@@ -18,7 +18,7 @@ def test_event(test_client):
         "user_id": 5,
         "camera_id": 2,
         "event_type": "IMAGE_CAPTURE_FAILED",
-        "timestamp": datetime.date(2022, 4, 4)
+        "timestamp": datetime.date(2022, 1, 1)
     }
     response = test_client.post("/v1/events", data=input_data)
     response_data = json.loads(response.get_data(as_text=True))
