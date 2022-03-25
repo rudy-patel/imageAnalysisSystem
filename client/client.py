@@ -17,9 +17,7 @@ from collections import defaultdict
 
 class Client():
 
-
     def __init__(self, ip, port):
-        #Set up ports/ip infos
         self.port = port
         self.ip = ip
         #For now, 1 = facial detection and 0 = fault detection
@@ -30,39 +28,31 @@ class Client():
         self.name = socket.gethostname()
         self.vs = VideoStream(usePiCamera=True).start()
         self.encode_data = pickle.loads(open("encodings.pickle", "rb").read())
-        #Only send one event per name every 10 second interval
-        #Before sending and event make sure time.now() - timeout[NAME] > 10s
-        #When an event is sent, store the timestamp in timeouts[NAME]
         self.timeouts = defaultdict(int)
-
+        self.timeout_duration = 60
+        self.location = "/home/pi/imageAnalysisSystem/client"
         #Camera warmup sleep
         time.sleep(2.0)
-
-
 
 
     def run(self):
         #Main loop
         while True:
             #Check for heartbeat/configure
-            #Get frame
             frame = self.vs.read()
-            #get
             if self.facial_mode:
                 frame = self.facial_req(frame, self.encode_data)
             else:
                 #Fault detection here
                 pass
-
             self.sender.send_image(self.camera_id, frame)
-            #send frame to live.datastream
 
 
     #Send a POST request to the server event route
     def facial_req_event(self, name, frame):
         stamp = int(time.time())
         #Check timeout
-        if stamp - self.timeouts[name] < 60:
+        if stamp - self.timeouts[name] < self.timeout_duration:
             return
         #Convert to jpg and save temp file
         #10 digit random string with very low collision probability
@@ -86,8 +76,7 @@ class Client():
         requests.post("http://127.0.0.1:5000/v1/"+ str(self.camera_id) + "/facial-detection-event", files=file, data=data)
         
         #Delete temp file
-        location = "/home/pi/imageAnalysisSystem/client"
-        path = os.path.join(location, filename)
+        path = os.path.join(self.location, filename)
         os.remove(path)
         #Set new timeout
         self.timeouts[name] = stamp
@@ -95,7 +84,6 @@ class Client():
 
     def update_encodings(self):
         self.data = pickle.loads(open("encodings.pickle", "rb").read())
-
 
 
     #takes a frame and returns a cv2 facial req boxed frame
@@ -112,7 +100,6 @@ class Client():
         # compute the facial embeddings for each face bounding box
         encodings = face_recognition.face_encodings(frame, boxes)
         names = []
-
         # loop over the facial embeddings
         for encoding in encodings:
             # attempt to match each face in the input image to our known
@@ -148,7 +135,6 @@ class Client():
 
             # update the list of names
             names.append(name)
-
         # loop over the recognized faces
         for ((top, right, bottom, left), name) in zip(boxes, names):
             # draw the predicted face name on the image - color is in BGR
@@ -157,14 +143,10 @@ class Client():
             y = top - 15 if top - 15 > 15 else top + 15
             cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX,
                 .8, (0, 255, 255), 2)
-
-
         if match:
             self.facial_req_event(names[0], frame)
-
         # display the image to our screen
         return frame
-
 
 
 def main():
