@@ -1,7 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Train</h3>
+{% import "bootstrap/wtf.html" as wtf %}
+
 <body>
+  <div class="container">
+  <div class="row justify-content-center">
+    <h3>Upload a New Reference Image</h3>
+  </div>
+
+  <form class="form-uploadImage" method="POST" action ="/train" enctype="multipart/form-data">
+    <div class="form-group">
+      {{ form.hidden_tag() }}
+      {{ wtf.form_field(form.file) }}
+      {{ wtf.form_field(form.personSelect) }}
+      {{ wtf.form_field(form.newPersonName) }}
+      <p><button type="submit" class="btn btn-primary">Upload Training Data</button></p>
+    </div>
+  </form>
+
+  {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+        </div>
+  {% endfor %}
+  
   <!--
     <div class="container">
       <div class="input-group">
@@ -15,10 +38,6 @@
       </div>
     </div>
     -->
-    <h1>File Upload</h1>
-    <form method="POST" action="" enctype="multipart/form-data">
-      <p><input type="file" name="file"></p>
-      <p><input type="submit" value="Submit"></p>
-    </form>
+  </div>
   </body>
 {% endblock %}

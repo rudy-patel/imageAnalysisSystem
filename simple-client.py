@@ -14,7 +14,7 @@ test_obj = {
     }
 
 test_file = {
-    "image": ('test', open('Screenshot_20220210-080248_Chrome.jpg', 'rb'), 'image/jpg')
+    "image": ('Jacob-testuniqueid2', open('Screenshot_20220210-080248_Chrome.jpg', 'rb'), 'image/jpg')
 }
 
 x = requests.post(hardcoded_url, files=test_file, data=test_obj)
