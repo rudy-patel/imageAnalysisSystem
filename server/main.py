@@ -5,7 +5,7 @@ from server.models.models import Users, Event, Camera
 from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, Response, abort
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from server.Forms import LoginForm, SignUpForm
+from server.Forms import LoginForm, SignUpForm, TrainingForm
 from os import environ
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -178,22 +178,22 @@ def cameras():
         camera.mode = camera.mode.value
     return render_template("cameras.html", cameras=cameras)
 
-@bp.route("/train")
+@bp.route("/train", methods=['GET', 'POST'])
 @login_required
 def train():
-    return render_template("train.html")
+    form = TrainingForm()
 
-@bp.route("/train", methods=['POST'])
-def upload_file():
-    file = request.files['file']
-    if file.filename != '':
-        if file:
-            file.filename = secure_filename(file.filename)
-            output = send_to_s3(file, "lfiasimagestore")
-            return str(output)
-    else:
-        return redirect("myapp.home")
-    return redirect(url_for('myapp.train'))
+    if form.validate_on_submit():
+        if form.file.data.filename != '':
+            if form.file:
+                form.file.data.filename = secure_filename(form.file.data.filename)
+                output = send_to_s3(form.file.data, "lfiasimagestore")
+                flash(str(output))
+                return redirect(url_for('myapp.train'))
+        else:
+            return redirect("myapp.home")
+    
+    return render_template("train.html", form=form)
 
 def send_to_s3(file, bucket_name):
         session = boto3.Session(profile_name='default')
@@ -204,13 +204,13 @@ def send_to_s3(file, bucket_name):
                 bucket_name,
                 file.filename,
                 ExtraArgs={
-                    "ContentType": file.content_type    #Set appropriate content type as per the file
+                    "ContentType": file.content_type #Set appropriate content type as per the file
                 }
             )
         except Exception as e:
             print("Something Happened: ", e)
             return e
-        return "{} recieved {}".format("us-west-2", file.filename)
+        return "{} recieved {} successfully!".format("us-west-2", file.filename)
 
 if __name__ == "__main__":
     app = create_app()
