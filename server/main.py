@@ -89,11 +89,6 @@ def face_detected(camera_id):
 
 # ------------
 
-@bp.route("/view_images")
-@login_required
-def view_images():
-    list_of_files = list_all_files_from_s3("lfiasimagestore")
-    return render_template("view_images.html", )
 
 @loginManager.user_loader
 def loadUser(id):
