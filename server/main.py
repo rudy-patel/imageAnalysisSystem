@@ -198,6 +198,7 @@ def events():
     events = Event.query.order_by(Event.timestamp.desc()).all()
     for event in events:
         event.type = event.type.value
+        event.timestamp = event.timestamp.strftime("%d-%b-%Y %I:%M %p")
     return render_template("events.html", events=events)
 
 @bp.route("/view_event/<int:event_id>")
@@ -205,6 +206,7 @@ def events():
 def event_view(event_id):
     event = Event.query.filter_by(id=event_id).first()
     event.type = event.type.value
+    event.timestamp = event.timestamp.strftime("%d-%b-%Y %I:%M %p")
     return render_template("event_view.html", event=event)
 
 @bp.route("/cameras")
