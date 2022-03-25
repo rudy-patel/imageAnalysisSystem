@@ -44,7 +44,7 @@ def create_app():
 
 # This is a generic example that posts a new event
 @bp.route("/v1/events", methods=["POST"])
-def new_event():        
+def new_event(): 
     data = jsonify(request.form).json
     user_id = data["user_id"]
     camera_id = data["camera_id"]
@@ -63,13 +63,21 @@ def new_event():
 
 # This is for posting a new facial recognition
 @bp.route("/v1/<int:camera_id>/facial-detection-event", methods=["POST"])
-def face_detected():
-    data = jsonify(request.form).json
-    user_id = data["user_id"]
-    name = data["name"]
-    event_type = data["event_type"]
-    timestamp = data["timestamp"]
-    image_link = data["image_link"]
+def face_detected(camera_id):
+    print("attempting to get request files")
+    image = request.files["image"]
+    print("attempting to save file")
+    # image.save(secure_filename(image.filename))
+
+    print("getting the remainder of the data")
+    # data = jsonify(request.form).json
+    user_id = request.form.get("user_id")
+    name = request.form.get("name")
+    event_type = request.form.get("event_type")
+    timestamp = request.form.get("timestamp")
+
+    print("Sending to s3")
+    image_link = send_to_s3(image, "lfiasimagestore")
 
     try:
         newEvent = Event(user_id=user_id, camera_id=camera_id, name=name, type=event_type, timestamp=timestamp, image_link=image_link)
