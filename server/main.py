@@ -64,19 +64,15 @@ def new_event():
 # This is for posting a new facial recognition
 @bp.route("/v1/<int:camera_id>/facial-detection-event", methods=["POST"])
 def face_detected(camera_id):
-    print("attempting to get request files")
-    image = request.files["image"]
-    print("attempting to save file")
-    # image.save(secure_filename(image.filename))
 
-    print("getting the remainder of the data")
-    # data = jsonify(request.form).json
     user_id = request.form.get("user_id")
     name = request.form.get("name")
     event_type = request.form.get("event_type")
     timestamp = request.form.get("timestamp")
 
-    print("Sending to s3")
+    image = request.files["image"]
+    image.filename = "{}/{}/face_images/{}/{}".format(user_id, camera_id, name, image.filename)
+
     image_link = send_to_s3(image, "lfiasimagestore")
 
     try:
@@ -92,6 +88,12 @@ def face_detected(camera_id):
         abort(422)
 
 # ------------
+
+@bp.route("/view_images")
+@login_required
+def view_images():
+    list_of_files = list_all_files_from_s3("lfiasimagestore")
+    return render_template("view_images.html", )
 
 @loginManager.user_loader
 def loadUser(id):
@@ -244,7 +246,15 @@ def send_to_s3(file, bucket_name):
         except Exception as e:
             print("Something Happened: ", e)
             return e
-        return "https://lfiasimagestore.s3.us-west-2.amazonaws.com/{}".format(file.filename)
+        return "https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, file.filename)
+
+# Untested, but would retrieve all filenames from s3 and convert them to URL form
+# Unneeded as this url should already be associated with events in the database
+# def list_all_files_from_s3(bucket_name):
+#     contents = []
+#     for image in bucket_name.objects.all():
+#         contents.append("https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, image.key))
+#     return contents
 
 if __name__ == "__main__":
     app = create_app()
