@@ -12,6 +12,7 @@ import requests
 import random
 import string
 import os
+from collections import defaultdict
 
 class Client():
 
@@ -23,13 +24,14 @@ class Client():
         #For now, 1 = facial detection and 0 = fault detection
         self.facial_mode = True 
         self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, port))
-        self.camera_id = socket.gethostname()
+        self.camera_id = 1
+        self.host_name = socket.gethostname()
         self.vs = VideoStream(usePiCamera=True).start()
-        self.data = pickle.loads(open("encodings.pickle", "rb").read())
+        self.encode_data = pickle.loads(open("encodings.pickle", "rb").read())
         #Only send one event per name every 10 second interval
         #Before sending and event make sure time.now() - timeout[NAME] > 10s
         #When an event is sent, store the timestamp in timeouts[NAME]
-        self.timeouts = {}
+        self.timeouts = defaultdict(int)
 
         #Camera warmup sleep
         time.sleep(2.0)
@@ -45,7 +47,7 @@ class Client():
             frame = self.vs.read()
             #get
             if self.facial_mode:
-                frame = Client.facial_req(frame, self.data)
+                frame = self.facial_req(frame, self.encode_data)
             else:
                 #Fault detection here
                 pass
@@ -77,7 +79,8 @@ class Client():
         file = {
             "image": ("filename", open(filename, "rb"), 'image/jpg')
         }
-        requests.post("localhost/v1/camera_id/facial-detection-event", files=file, data=data)
+        print("Sending request")
+        requests.post("http://127.0.0.1:5000/v1/"+ str(self.camera_id) + "/facial-detection-event", files=file, data=data)
         
         #Delete temp file
         os.remove(filename)
