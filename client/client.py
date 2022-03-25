@@ -25,8 +25,9 @@ class Client():
         #For now, 1 = facial detection and 0 = fault detection
         self.facial_mode = True 
         self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, port))
+        #ON CONFIG the camera will get its ID and asscoiated user
         self.camera_id = 1
-        self.host_name = socket.gethostname()
+        self.name = socket.gethostname()
         self.vs = VideoStream(usePiCamera=True).start()
         self.encode_data = pickle.loads(open("encodings.pickle", "rb").read())
         #Only send one event per name every 10 second interval
@@ -80,6 +81,7 @@ class Client():
         file = {
             "image": (filename, open(filename, "rb"), 'image/jpg')
         }
+
         print("Sending request, Name: " + name)
         requests.post("http://127.0.0.1:5000/v1/"+ str(self.camera_id) + "/facial-detection-event", files=file, data=data)
         
