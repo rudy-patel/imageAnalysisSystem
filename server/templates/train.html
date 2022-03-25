@@ -5,31 +5,19 @@
 <body>
   <div class="container">
   <div class="row justify-content-center">
-    <h3>Upload a new reference image</h3>
+    <h3>Upload a New Reference Image</h3>
   </div>
 
   <form class="form-uploadImage" method="POST" action ="/train" enctype="multipart/form-data">
     <div class="form-group">
       {{ form.hidden_tag() }}
       {{ wtf.form_field(form.file) }}
-      
-      <label for="personSelect2">Select a person</label>
-      <select multiple class="form-control" id="personSelect2">
-        <option>Bob</option>
-        <option>Joe</option>
-        <option>Kanye</option>
-        <option>Elon</option>
-        <option>Kaden</option>
-        <option>Jacob</option>
-        <option>Braden</option>
-      </select>
-      
-      <label for="newPersonTextInput">Insert name of new person</label>
-      <textarea class="form-control" id="newPersonTextInput" rows="1"></textarea>
-      
+      {{ wtf.form_field(form.personSelect) }}
+      {{ wtf.form_field(form.newPersonName) }}
       <p><button type="submit" class="btn btn-primary">Upload Training Data</button></p>
     </div>
   </form>
+
   {% for message in get_flashed_messages() %}
         <div class="alert alert-warning">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
