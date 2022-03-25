@@ -12,6 +12,7 @@ import requests
 import random
 import string
 import os
+from datetime import datetime
 from collections import defaultdict
 
 class Client():
@@ -60,7 +61,7 @@ class Client():
     def facial_req_event(self, name, frame):
         stamp = int(time.time())
         #Check timeout
-        if stamp - self.timeouts[name] < 10:
+        if stamp - self.timeouts[name] < 60:
             return
         #Convert to jpg and save temp file
         #10 digit random string with very low collision probability
@@ -73,13 +74,13 @@ class Client():
             "user_id": 4,
             "name": name,
             "event_type": "FACIAL_MATCH_SUCCESS",
-            "timestamp": stamp, #Stamp may need to be reformatted
+            "timestamp": datetime.now(), #Stamp may need to be reformatted
             }
 
         file = {
-            "image": ("filename", open(filename, "rb"), 'image/jpg')
+            "image": (filename, open(filename, "rb"), 'image/jpg')
         }
-        print("Sending request")
+        print("Sending request, Name: " + name)
         requests.post("http://127.0.0.1:5000/v1/"+ str(self.camera_id) + "/facial-detection-event", files=file, data=data)
         
         #Delete temp file
