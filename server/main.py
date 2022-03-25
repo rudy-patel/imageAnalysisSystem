@@ -218,8 +218,8 @@ def train():
         if form.file.data.filename != '':
             if form.file:
                 form.file.data.filename = secure_filename(form.file.data.filename)
-                output = send_to_s3(form.file.data, "lfiasimagestore")
-                flash(str(output))
+                filepath = send_to_s3(form.file.data, "lfiasimagestore")
+                flash("Saved image successfully at: {}".format(str(filepath)))
                 return redirect(url_for('myapp.train'))
         else:
             return redirect("myapp.home")
