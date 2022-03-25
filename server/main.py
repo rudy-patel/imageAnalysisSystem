@@ -5,7 +5,7 @@ from server.models.models import Users, Event, Camera
 from flask import Flask, Blueprint, redirect, url_for, render_template, request, jsonify, flash, Response, abort
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from server.Forms import LoginForm, SignUpForm
+from server.Forms import LoginForm, SignUpForm, TrainingForm
 from os import environ
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,8 +13,10 @@ import boto3
 import cv2
 from server import server_camera
 from importlib import import_module
+from flask_migrate import Migrate
 
 bp = Blueprint('myapp', __name__)
+migrate = Migrate()
 
 loginManager = LoginManager()
 
@@ -33,14 +35,16 @@ def create_app():
 
     from server.models.models import db
     db.init_app(app)
+    migrate.init_app(app, db)
 
     return app
   
  # API Endpoints
 # TODO integrate with our token-based security to lock down these endpoints as per best practices
 
+# This is a generic example that posts a new event
 @bp.route("/v1/events", methods=["POST"])
-def new_event():        
+def new_event(): 
     data = jsonify(request.form).json
     user_id = data["user_id"]
     camera_id = data["camera_id"]
@@ -48,7 +52,7 @@ def new_event():
     timestamp = data["timestamp"]
 
     try:
-        newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp)
+        newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp, name = "yo", image_link="bro")
         newEvent.create()
         return jsonify({
             'success': True
@@ -57,7 +61,34 @@ def new_event():
     except:
         abort(422)
 
+# This is for posting a new facial recognition
+@bp.route("/v1/<int:camera_id>/facial-detection-event", methods=["POST"])
+def face_detected(camera_id):
+
+    user_id = request.form.get("user_id")
+    name = request.form.get("name")
+    event_type = request.form.get("event_type")
+    timestamp = request.form.get("timestamp")
+
+    image = request.files["image"]
+    image.filename = "{}/{}/face_images/{}/{}".format(user_id, camera_id, name, image.filename)
+
+    image_link = send_to_s3(image, "lfiasimagestore")
+
+    try:
+        newEvent = Event(user_id=user_id, camera_id=camera_id, name=name, type=event_type, timestamp=timestamp, image_link=image_link)
+        newEvent.create()
+        
+        return jsonify({
+            'success': True
+        })
+
+    except Exception as e:
+        print(e)
+        abort(422)
+
 # ------------
+
 
 @loginManager.user_loader
 def loadUser(id):
@@ -185,22 +216,22 @@ def cameras():
         camera.mode = camera.mode.value
     return render_template("cameras.html", cameras=cameras)
 
-@bp.route("/train")
+@bp.route("/train", methods=['GET', 'POST'])
 @login_required
 def train():
-    return render_template("train.html")
+    form = TrainingForm()
 
-@bp.route("/train", methods=['POST'])
-def upload_file():
-    file = request.files['file']
-    if file.filename != '':
-        if file:
-            file.filename = secure_filename(file.filename)
-            output = send_to_s3(file, "lfiasimagestore")
-            return str(output)
-    else:
-        return redirect("myapp.home")
-    return redirect(url_for('myapp.train'))
+    if form.validate_on_submit():
+        if form.file.data.filename != '':
+            if form.file:
+                form.file.data.filename = secure_filename(form.file.data.filename)
+                filepath = send_to_s3(form.file.data, "lfiasimagestore")
+                flash("Saved image successfully at: {}".format(str(filepath)))
+                return redirect(url_for('myapp.train'))
+        else:
+            return redirect("myapp.home")
+    
+    return render_template("train.html", form=form)
 
 def send_to_s3(file, bucket_name):
         session = boto3.Session(profile_name='default')
@@ -211,13 +242,13 @@ def send_to_s3(file, bucket_name):
                 bucket_name,
                 file.filename,
                 ExtraArgs={
-                    "ContentType": file.content_type    #Set appropriate content type as per the file
+                    "ContentType": file.content_type #Set appropriate content type as per the file
                 }
             )
         except Exception as e:
             print("Something Happened: ", e)
             return e
-        return "{} recieved {}".format("us-west-2", file.filename)
+        return "https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, file.filename)
 
 if __name__ == "__main__":
     app = create_app()
