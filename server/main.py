@@ -169,6 +169,13 @@ def events():
         event.type = event.type.value
     return render_template("events.html", events=events)
 
+@bp.route("/view_event/<int:event_id>")
+@login_required
+def event_view(event_id):
+    event = Event.query.filter_by(id=event_id).first()
+    event.type = event.type.value
+    return render_template("event_view.html", event=event)
+
 @bp.route("/cameras")
 @login_required
 def cameras():

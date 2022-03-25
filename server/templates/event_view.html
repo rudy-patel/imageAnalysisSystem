@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                <h3>Img: {{event.image_link}}</h3>
+            </div>
+        </div>
+        <div class="col">
+            <div class="row">
+                <h3>Camera: {{event.camera_id}}</h3>
+            </div>
+            <div class="row">
+                <h3>Type: {{event.type}}</h3>
+            </div>
+            <div class="row">
+                <h3>Name: {{event.name}}</h3>
+            </div>
+            <div class="row">
+                <h3>Time: {{event.timestamp}}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
