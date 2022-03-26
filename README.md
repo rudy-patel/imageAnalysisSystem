@@ -1,7 +1,7 @@
 [![Build](https://img.shields.io/github/workflow/status/rudy-patel/imageAnalysisSystem/Python%20application/main)](https://github.com/rudy-patel/imageAnalysisSystem/actions/workflows/python-app.yml)
 [![Issues](https://img.shields.io/github/issues/rudy-patel/imageAnalysisSystem)](https://github.com/rudy-patel/imageAnalysisSystem/issues)
-![](https://img.shields.io/github/repo-size/rudy-patel/imageAnalysisSystem)
 [![Pull Requests](https://img.shields.io/github/issues-pr/rudy-patel/imageAnalysisSystem)](https://github.com/rudy-patel/imageAnalysisSystem/pulls)
+![](https://img.shields.io/github/repo-size/rudy-patel/imageAnalysisSystem)
 [![License](https://img.shields.io/github/license/rudy-patel/imageAnalysisSystem)](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Low-Footprint Image Analysis System
