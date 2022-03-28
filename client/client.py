@@ -12,6 +12,7 @@ import requests
 import random
 import string
 import os
+from server.enums.cameraEnums import CameraMode, CameraStatus
 from datetime import datetime
 from collections import defaultdict
 
@@ -21,7 +22,7 @@ class Client():
         self.port = port
         self.ip = ip
         #For now, 1 = facial detection and 0 = fault detection
-        self.facial_mode = True 
+        self.mode = True 
         self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, port))
         #ON CONFIG the camera will get its ID and asscoiated user
         self.camera_id = 1
@@ -58,9 +59,12 @@ class Client():
         now = int(time.time())
         if now - self.last_heartbeat > self.heartbeat_interval:
             #Send another heartbeat
-            new_data = requests.get("http://127.0.0.1:5000/v1/heartbeat/" + str(self.camera_id))
+            new_data = requests.get("http://127.0.0.1:5000/v1/heartbeat/" + str(self.camera_id)).json()
             #parse new data
-            print(new_data)
+            self.facial_mode = new_data['mode']
+            
+            print(new_data['camera_id'])
+            
             #Set last_heartbeat 
             self.last_heartbeat = now
 
