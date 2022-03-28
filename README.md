@@ -12,6 +12,8 @@ This project runs inside a Python virtual environment. To set up your environmen
 1. Navigate to the root directory in terminal
 2. Create a virtual environment using: `python3 -m venv env`
 
+To setup the hardware unit, follow the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/wiki/Hardware-Configuration).
+
 On **Linux/MacOS**:
 - Run `source env/bin/activate` to **start** the Python virtual environment.
 - Run `deactivate` to **stop** the Python virtual environment.
