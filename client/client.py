@@ -31,7 +31,7 @@ class Client():
         self.timeouts = defaultdict(int)
         self.timeout_duration = 60
         self.location = "/home/pi/imageAnalysisSystem/client"
-        self.active_livestream = False
+        self.active_livestream = True
         self.heartbeat_interval = 10
         self.last_heartbeat = 0
         #Camera warmup sleep
@@ -49,7 +49,7 @@ class Client():
             else:
                 #Fault detection here
                 pass
-            if self.active_livestream():
+            if self.active_livestream:
                 self.sender.send_image(self.camera_id, frame)
 
 
@@ -58,7 +58,7 @@ class Client():
         now = int(time.time())
         if now - self.last_heartbeat > self.heartbeat_interval:
             #Send another heartbeat
-            new_data = requests.get("http://127.0.0.1:5000/v1/heartbeat/" + self.camera_id)
+            new_data = requests.get("http://127.0.0.1:5000/v1/heartbeat/" + str(self.camera_id))
             #parse new data
             print(new_data)
             #Set last_heartbeat 
