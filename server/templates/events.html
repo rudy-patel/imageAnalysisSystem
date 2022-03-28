@@ -9,6 +9,7 @@
               <tr>
                 <th>Camera</th>
                 <th>Type</th>
+                <th>Name</th>
                 <th>Time</th>
                 <th>Action</th>
               </tr>
@@ -19,6 +20,7 @@
               <tr>
                 <td>Camera #{{event.camera_id}}</td>
                 <td>{{event.type}}</td>
+                <td>{{event.name}}</td>
                 <td>{{event.timestamp}}</td>
                 <td>
                     <a role="button" class="btn btn-primary" href="{{ url_for('myapp.event_view' , event_id=event.id) }}">View Event</a>
@@ -31,6 +33,7 @@
               <tr>
                 <th scope="col">Camera</th>
                 <th scope="col">Type</th>
+                <th scope="col">Name</th>
                 <th scope="col">Time</th>
                 <th scope="col">Action</th>
               </tr>
@@ -46,7 +49,7 @@
   var table = $('.events-table').DataTable({
     searching: true, // enable search input
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]], // custom number of entries
-    order: [[2, 'desc']]
+    order: [[3, 'desc']]
   });
 
   $('.events-table tfoot th').each( function () {
