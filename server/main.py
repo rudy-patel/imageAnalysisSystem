@@ -61,6 +61,17 @@ def new_event():
     except:
         abort(422)
 
+
+
+@bp.route("/v1/heartbeat/<int:camera_id>", methods=["GET"])
+def heartbeat(camera_id):
+    #Renew heartbeat timestamp
+    #Get primary camera ID for user
+    return jsonify({'camera_id': camera_id, 'mode': CameraMode.FACIAL_RECOGNITION.value, 'is_primary': True, 'encodings': None})
+
+
+
+
 # This is for posting a new facial recognition
 @bp.route("/v1/<int:camera_id>/facial-detection-event", methods=["POST"])
 def face_detected(camera_id):
