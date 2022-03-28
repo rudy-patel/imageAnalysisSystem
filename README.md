@@ -32,7 +32,7 @@ To run the server:
 3. Install the dependencies by running `pip install -r requirements.txt`.
 4. Run `python3 -m server.main` to start the server.
 
-You're all set! The server should now be running on `127.0.0.1:3000`.
+You're all set! The server should now be running on `127.0.0.1:5000`.
 
 ### Running the client
 To run the client:
