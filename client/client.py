@@ -12,7 +12,7 @@ import requests
 import random
 import string
 import os
-from server.enums.cameraEnums import CameraMode, CameraStatus
+#from server.enums.cameraEnums import CameraMode, CameraStatus
 from datetime import datetime
 from collections import defaultdict
 
@@ -22,7 +22,7 @@ class Client():
         self.port = port
         self.ip = ip
         #For now, 1 = facial detection and 0 = fault detection
-        self.mode = True 
+        self.mode = "FACIAL_RECOGNITION"
         self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, port))
         #ON CONFIG the camera will get its ID and asscoiated user
         self.camera_id = 1
@@ -32,8 +32,8 @@ class Client():
         self.timeouts = defaultdict(int)
         self.timeout_duration = 60
         self.location = "/home/pi/imageAnalysisSystem/client"
-        self.active_livestream = True
-        self.heartbeat_interval = 10
+        self.is_primary = True
+        self.heartbeat_interval = 30
         self.last_heartbeat = 0
         #Camera warmup sleep
         time.sleep(2.0)
@@ -45,12 +45,12 @@ class Client():
             #Send heartbeat
             self.heartbeat()
             frame = self.vs.read()
-            if self.facial_mode:
+            if self.mode == "FACIAL_RECOGNITION":
                 frame = self.facial_req(frame, self.encode_data)
             else:
                 #Fault detection here
                 pass
-            if self.active_livestream:
+            if self.is_primary:
                 self.sender.send_image(self.camera_id, frame)
 
 
@@ -62,8 +62,10 @@ class Client():
             new_data = requests.get("http://127.0.0.1:5000/v1/heartbeat/" + str(self.camera_id)).json()
             #parse new data
             self.facial_mode = new_data['mode']
+            self.is_primary = new_data['is_primary']
             
-            print(new_data['camera_id'])
+            print("Heartbeat response:")
+            print(new_data)
             
             #Set last_heartbeat 
             self.last_heartbeat = now
