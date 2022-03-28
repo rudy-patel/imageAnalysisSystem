@@ -61,6 +61,16 @@ def new_event():
     except:
         abort(422)
 
+
+
+@bp.route("/v1/heartbeat/<int:camera_id>", methods=["GET"])
+def heartbeat(camera_id):
+    
+    return jsonify({'data': camera_id})
+
+
+
+
 # This is for posting a new facial recognition
 @bp.route("/v1/<int:camera_id>/facial-detection-event", methods=["POST"])
 def face_detected(camera_id):

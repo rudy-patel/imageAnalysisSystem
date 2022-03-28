@@ -31,6 +31,9 @@ class Client():
         self.timeouts = defaultdict(int)
         self.timeout_duration = 60
         self.location = "/home/pi/imageAnalysisSystem/client"
+        self.active_livestream = False
+        self.heartbeat_interval = 10
+        self.last_heartbeat = 0
         #Camera warmup sleep
         time.sleep(2.0)
 
@@ -38,14 +41,28 @@ class Client():
     def run(self):
         #Main loop
         while True:
-            #Check for heartbeat/configure
+            #Send heartbeat
+            self.heartbeat()
             frame = self.vs.read()
             if self.facial_mode:
                 frame = self.facial_req(frame, self.encode_data)
             else:
                 #Fault detection here
                 pass
-            self.sender.send_image(self.camera_id, frame)
+            if self.active_livestream():
+                self.sender.send_image(self.camera_id, frame)
+
+
+    def heartbeat(self):
+        #Send get request to the server every X seconds
+        now = int(time.time())
+        if now - self.last_heartbeat > self.heartbeat_interval:
+            #Send another heartbeat
+            new_data = requests.get("http://127.0.0.1:5000/v1/heartbeat/" + self.camera_id)
+            #parse new data
+            print(new_data)
+            #Set last_heartbeat 
+            self.last_heartbeat = now
 
 
     #Send a POST request to the server event route
@@ -65,7 +82,7 @@ class Client():
             "user_id": 4,
             "name": name,
             "event_type": "FACIAL_MATCH_SUCCESS",
-            "timestamp": datetime.now(), #Stamp may need to be reformatted
+            "timestamp": datetime.now(), 
             }
 
         file = {
