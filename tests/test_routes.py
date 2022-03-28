@@ -25,10 +25,11 @@ def test_event(test_client):
     assert response_data['success'] == True
 
 def test_heartbeat(client):
-    response = client.get("/v1/heartbeat/2")
+    cameraID = 2
+    response = client.get("/v1/heartbeat/" + str(cameraID))
     response_data = json.loads(response.get_data(as_text=True))
     
-    assert response_data['camera_id'] == 2
+    assert response_data['camera_id'] == cameraID
     assert response_data['mode'] == "FACIAL_RECOGNITION"
     assert response_data['is_primary'] == True
     assert response_data['encodings'] == None
