@@ -23,3 +23,13 @@ def test_event(test_client):
     response = test_client.post("/v1/events", data=input_data)
     response_data = json.loads(response.get_data(as_text=True))
     assert response_data['success'] == True
+
+def test_heartbeat(client):
+    cameraID = 2
+    response = client.get("/v1/heartbeat/" + str(cameraID))
+    response_data = json.loads(response.get_data(as_text=True))
+    
+    assert response_data['camera_id'] == cameraID
+    assert response_data['mode'] == "FACIAL_RECOGNITION"
+    assert response_data['is_primary'] == True
+    assert response_data['encodings'] == None
