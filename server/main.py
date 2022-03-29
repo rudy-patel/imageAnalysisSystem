@@ -55,17 +55,11 @@ def update_camera_status():
 
     with app.app_context():
         online_cameras = Camera.query.filter_by(status = CameraStatus.ONLINE).all()
-
-        print(online_cameras)
         for cam in online_cameras:
             if  datetime.now().timestamp() - cam.last_heartbeat.timestamp() > 60:
                 cam.status = CameraStatus.OFFLINE
                 cam.update()
-        
-
-   # print("This test runs every 10 seconds")
-
-
+    
 
  # API Endpoints
 # TODO integrate with our token-based security to lock down these endpoints as per best practices
