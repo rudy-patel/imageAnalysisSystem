@@ -259,6 +259,7 @@ def cameras():
     for camera in cameras:
         camera.status = camera.status.value
         camera.mode = camera.mode.value
+        camera.last_heartbeat = camera.last_heartbeat.strftime("%d-%b-%Y %I:%M %p")
     return render_template("cameras.html", cameras=cameras)
 
 @bp.route("/train", methods=['GET', 'POST'])
