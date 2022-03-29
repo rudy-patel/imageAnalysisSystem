@@ -15,6 +15,9 @@ import os
 #from server.enums.cameraEnums import CameraMode, CameraStatus
 from datetime import datetime
 from collections import defaultdict
+import circle_fault_detect as cfd
+
+
 
 class Client():
 
@@ -22,7 +25,7 @@ class Client():
         self.port = port
         self.ip = ip
         #For now, 1 = facial detection and 0 = fault detection
-        self.mode = "FACIAL_RECOGNITION"
+        self.mode = "FAULT_DETECT"
         self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, "5555"))
         #ON CONFIG the camera will get its ID and asscoiated user
         self.camera_id = 1
@@ -35,6 +38,7 @@ class Client():
         self.is_primary = True
         self.heartbeat_interval = 60
         self.last_heartbeat = 0
+        self.fault_detection_timeout = 20
         #Camera warmup sleep
         time.sleep(2.0)
 
@@ -43,13 +47,12 @@ class Client():
         #Main loop
         while True:
             #Send heartbeat
-            self.heartbeat()
+            #self.heartbeat()
             frame = self.vs.read()
             if self.mode == "FACIAL_RECOGNITION":
                 frame = self.facial_req(frame, self.encode_data)
             else:
-                #Fault detection here
-                pass
+                self.circle_fault_detect(frame)
             if self.is_primary:
                 self.sender.send_image(self.camera_id, frame)
 
@@ -63,14 +66,37 @@ class Client():
             #parse new data
             self.mode = new_data['mode']
             self.is_primary = new_data['is_primary']
-
-            
             print("Heartbeat response:")
             print(new_data)
             
             #Set last_heartbeat 
             self.last_heartbeat = now
+    
+    def circle_fault_detect(self, frame):
+        print("Attempting fault detection")
+        stamp = int(time.time())
+        #Check timeout
+        if stamp - self.timeouts["fault_detect"] < self.fault_detection_timeout:
+            return
+        print("Timeout check passed")
+        #convert to jpg
+        frame = cv2.imencode('.jpg', frame)
+        threshold = cfd.findThreshold(frame)
+        frame = cfd.thresholdImage(frame, threshold)
+        frame = cfd.applyBinaryMorph(frame)
+        labeled_frame = cfd.applyImageCCL(frame)
+        is_defective, frame = cfd.renderLabeledImage(labeled_frame)
+        
+        if is_defective:
+            print("Send fault detect event")
+            #send event
+        else:
+            print("No fault detected")
+            
+        self.timeouts["fault_detect"] = int(time.time())
+            
 
+            
 
     #Send a POST request to the server event route
     def facial_req_event(self, name, frame):
