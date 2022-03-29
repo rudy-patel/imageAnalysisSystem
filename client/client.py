@@ -59,7 +59,7 @@ class Client():
         now = int(time.time())
         if now - self.last_heartbeat > self.heartbeat_interval:
             #Send another heartbeat
-            new_data = requests.get("http://127.0.0.1:5000/v1/heartbeat/" + str(self.camera_id)).json()
+            new_data = requests.get("http://" + self.ip + ":" + self.port + "/v1/heartbeat/" + str(self.camera_id)).json()
             #parse new data
             self.facial_mode = new_data['mode']
             self.is_primary = new_data['is_primary']
@@ -96,7 +96,7 @@ class Client():
         }
 
         print("Sending request, Name: " + name)
-        requests.post("http://127.0.0.1:5000/v1/"+ str(self.camera_id) + "/facial-detection-event", files=file, data=data)
+        requests.post("http://" + self.ip + ":" + self.port + "/v1/" + str(self.camera_id) + "/facial-detection-event", files=file, data=data)
         
         #Delete temp file
         path = os.path.join(self.location, filename)
@@ -174,7 +174,7 @@ class Client():
 
 def main():
 
-    client = Client("127.0.0.1", "5555")
+    client = Client("127.0.0.1", "5000")
     client.run()
 
 

@@ -66,6 +66,9 @@ def new_event():
 @bp.route("/v1/heartbeat/<int:camera_id>", methods=["GET"])
 def heartbeat(camera_id):
     #Renew heartbeat timestamp
+    cam = Camera.query.filter_by(id = camera_id).first()
+    cam.last_heartbeat = datetime.now()
+    cam.update()
     #Get primary camera ID for user
     return jsonify({'camera_id': camera_id, 'mode': CameraMode.FACIAL_RECOGNITION.value, 'is_primary': True, 'encodings': None})
 

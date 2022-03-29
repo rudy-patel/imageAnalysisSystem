@@ -12,6 +12,7 @@ class Users(db.Model, UserMixin):
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
+    primary_camera = db.Column(db.Integer, db.ForeignKey('camera.id'), nullable=True)
     events = db.relationship('Event', backref='users', lazy=True)
     cameras = db.relationship('Camera', backref='users', lazy=True)
 
@@ -38,7 +39,11 @@ class Camera(db.Model):
     name = db.Column(db.String(50), nullable=False)
     status = db.Column(db.Enum(CameraStatus), nullable=False)
     mode = db.Column(db.Enum(CameraMode), nullable=False)
+    last_heartbeat = db.Column(db.DateTime, nullable=True)
 
     def create(self):
         db.session.add(self)
+        db.session.commit()
+
+    def update():
         db.session.commit()
