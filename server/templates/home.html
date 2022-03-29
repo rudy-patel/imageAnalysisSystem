@@ -17,17 +17,10 @@
                                         }, 100)</script>
             </div>
             <div class="row justify-content-center">
-                <div class="col">Facial recognition</div>
-                <div class="col">
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider round"></span>
-                      </label>
-                </div>
-                <div class="col">Fault detection</div>
-            </div>
-            <div class="row justify-content-center">
-                <button type="button" class="btn btn-primary">Capture Image</button>
+                <form class="form-modes" method="POST" action ="/">
+                    <input type="submit" name="submit_button" value="Facial Recognition">
+                    <input type="submit" name="submit_button" value="Fault Detection">
+                </form>
             </div>
         </div>
         <div class="col-4">

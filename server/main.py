@@ -157,12 +157,20 @@ def testAddCamera():
     return redirect(url_for('myapp.home'))
 
 @bp.route("/home")
-@bp.route("/")
+@bp.route("/", methods=['GET', 'POST'])
 @login_required
 def home():
     events = Event.query.order_by(Event.timestamp.desc()).limit(3).all()
     for event in events:
         event.type = event.type.value
+    if request.method == 'POST':
+        if request.form['submit_button'] == 'Facial Recognition':
+            print("Facial")
+        elif request.form['submit_button'] == 'Fault Detection':
+            print("Fault")
+        else:
+            pass # unknown
+        return redirect(url_for('myapp.home'))
     return render_template("home.html", name=current_user.name, events=events)
 
 @bp.route("/login", methods=['GET', 'POST'])
