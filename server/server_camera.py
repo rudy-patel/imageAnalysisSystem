@@ -102,7 +102,6 @@ class Camera():
         while True:
             new_frame = cls.collect_frame(image_hub)
             try:
-                print("New frame set")
                 Camera.frame = new_frame
                 Camera.event.set()
 

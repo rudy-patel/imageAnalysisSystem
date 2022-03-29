@@ -33,7 +33,7 @@ class Client():
         self.timeout_duration = 60
         self.location = "/home/pi/imageAnalysisSystem/client"
         self.is_primary = True
-        self.heartbeat_interval = 10
+        self.heartbeat_interval = 60
         self.last_heartbeat = 0
         #Camera warmup sleep
         time.sleep(2.0)
@@ -57,7 +57,6 @@ class Client():
     def heartbeat(self):
         #Send get request to the server every X seconds
         now = int(time.time())
-        print(now - self.last_heartbeat)
         if now - self.last_heartbeat > self.heartbeat_interval:
             #Send another heartbeat
             new_data = requests.get("http://" + self.ip + ":" + self.port + "/v1/heartbeat/" + str(self.camera_id)).json()

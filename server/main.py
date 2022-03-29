@@ -40,7 +40,7 @@ def create_app():
 
     scheduler = BackgroundScheduler()
     # in your case you could change seconds to hours
-    scheduler.add_job(update_camera_status, trigger='interval', seconds=10)
+    scheduler.add_job(update_camera_status, trigger='interval', seconds=60)
     scheduler.start()
     try:
     # To keep the main thread alive
