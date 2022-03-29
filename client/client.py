@@ -23,7 +23,7 @@ class Client():
         self.ip = ip
         #For now, 1 = facial detection and 0 = fault detection
         self.mode = "FACIAL_RECOGNITION"
-        self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, port))
+        self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, "5555"))
         #ON CONFIG the camera will get its ID and asscoiated user
         self.camera_id = 1
         self.name = socket.gethostname()
@@ -33,7 +33,7 @@ class Client():
         self.timeout_duration = 60
         self.location = "/home/pi/imageAnalysisSystem/client"
         self.is_primary = True
-        self.heartbeat_interval = 30
+        self.heartbeat_interval = 60
         self.last_heartbeat = 0
         #Camera warmup sleep
         time.sleep(2.0)
@@ -59,10 +59,11 @@ class Client():
         now = int(time.time())
         if now - self.last_heartbeat > self.heartbeat_interval:
             #Send another heartbeat
-            new_data = requests.get("http://127.0.0.1:5000/v1/heartbeat/" + str(self.camera_id)).json()
+            new_data = requests.get("http://" + self.ip + ":" + self.port + "/v1/heartbeat/" + str(self.camera_id)).json()
             #parse new data
-            self.facial_mode = new_data['mode']
+            self.mode = new_data['mode']
             self.is_primary = new_data['is_primary']
+
             
             print("Heartbeat response:")
             print(new_data)
@@ -96,7 +97,7 @@ class Client():
         }
 
         print("Sending request, Name: " + name)
-        requests.post("http://127.0.0.1:5000/v1/"+ str(self.camera_id) + "/facial-detection-event", files=file, data=data)
+        requests.post("http://" + self.ip + ":" + self.port + "/v1/" + str(self.camera_id) + "/facial-detection-event", files=file, data=data)
         
         #Delete temp file
         path = os.path.join(self.location, filename)
@@ -174,7 +175,7 @@ class Client():
 
 def main():
 
-    client = Client("127.0.0.1", "5555")
+    client = Client("127.0.0.1", "5000")
     client.run()
 
 
