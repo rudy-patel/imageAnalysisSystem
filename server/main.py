@@ -98,8 +98,8 @@ def face_detected(camera_id):
         print(e)
         abort(422)
 
-# This is for posting a new fault analysis event
-@bp.route("/v1/<int:camera_id>/fault-analysis-event", methods=["POST"])
+# This is for posting a new ring fault analysis event
+@bp.route("/v1/<int:camera_id>/ring-fault-analysis-event", methods=["POST"])
 def fault_analysis(camera_id):
 
     user_id = request.form.get("user_id")
@@ -108,7 +108,7 @@ def fault_analysis(camera_id):
     timestamp = request.form.get("timestamp")
 
     analyzed_image = request.files["analyzed_image"]
-    analyzed_image.filename = "{}/{}/fault_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
+    analyzed_image.filename = "{}/{}/ring_fault_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
 
     image_link = send_to_s3(analyzed_image, "lfiasimagestore")
 
