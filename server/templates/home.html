@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-8">
             <div class="row">
-                <h4>Camera #{{camera.id}} {{camera.status}}</h4>
+                <h4>{{camera.name}} {{camera.status | enum_to_string}}</h4>
             </div>
             <div class="row">
                 <!-- 16:9 aspect ratio -->
@@ -34,7 +34,7 @@
                 <tbody>
                     {% for event in events %}
                     <tr>
-                      <td>{{event.type}}</td>
+                      <td>{{event.type | enum_to_string}}</td>
                       <td>
                         <a role="button" class="btn btn-primary" href="{{ url_for('myapp.event_view' , event_id=event.id) }}">View Event</a>
                       </td>
