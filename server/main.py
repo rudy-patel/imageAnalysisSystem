@@ -161,6 +161,8 @@ def testAddCamera():
 @login_required
 def home():
     events = Event.query.order_by(Event.timestamp.desc()).limit(3).all()
+    camera = Camera.query.filter_by(id=current_user.primary_camera).first()
+    camera.status = camera.status.value
     for event in events:
         event.type = event.type.value
     if request.method == 'POST':
@@ -171,7 +173,7 @@ def home():
         else:
             pass # unknown
         return redirect(url_for('myapp.home'))
-    return render_template("home.html", name=current_user.name, events=events)
+    return render_template("home.html", camera=camera, events=events)
 
 @bp.route("/login", methods=['GET', 'POST'])
 def login():
