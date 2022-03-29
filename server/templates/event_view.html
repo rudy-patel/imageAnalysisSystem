@@ -12,13 +12,13 @@
                 <h3>Camera: {{event.camera_id}}</h3>
             </div>
             <div class="row justify-content-start">
-                <h3>Type: {{event.type}}</h3>
+                <h3>Type: {{event.type | enum_to_string}}</h3>
             </div>
             <div class="row justify-content-start">
                 <h3>Name: {{event.name}}</h3>
             </div>
             <div class="row justify-content-start">
-                <h3>Time: {{event.timestamp}}</h3>
+                <h3>Time: {{event.timestamp | timestamp_to_string}}</h3>
             </div>
         </div>
     </div>
