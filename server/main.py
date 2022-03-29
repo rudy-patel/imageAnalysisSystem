@@ -93,7 +93,7 @@ def heartbeat(camera_id):
     cam.last_heartbeat = datetime.now()
     cam.update()
     #Get primary camera ID for user
-    return jsonify({'camera_id': camera_id, 'mode': CameraMode.FACIAL_RECOGNITION.value, 'is_primary': True, 'encodings': None})
+    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': True, 'encodings': None})
 
 
 
