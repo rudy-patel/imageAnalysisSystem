@@ -98,6 +98,32 @@ def face_detected(camera_id):
         print(e)
         abort(422)
 
+# This is for posting a new fault analysis event
+@bp.route("/v1/<int:camera_id>/fault-analysis-event", methods=["POST"])
+def fault_analysis(camera_id):
+
+    user_id = request.form.get("user_id")
+    name = request.form.get("name")
+    event_type = request.form.get("event_type")
+    timestamp = request.form.get("timestamp")
+
+    image = request.files["image"]
+    image.filename = "{}/{}/fault_images/{}/{}".format(user_id, camera_id, name, image.filename)
+
+    image_link = send_to_s3(image, "lfiasimagestore")
+
+    try:
+        newEvent = Event(user_id=user_id, camera_id=camera_id, name=name, type=event_type, timestamp=timestamp, image_link=image_link)
+        newEvent.create()
+        
+        return jsonify({
+            'success': True
+        })
+
+    except Exception as e:
+        print(e)
+        abort(422)
+
 # ------------
 
 
