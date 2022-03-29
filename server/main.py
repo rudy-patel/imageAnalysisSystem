@@ -107,10 +107,10 @@ def fault_analysis(camera_id):
     event_type = request.form.get("event_type")
     timestamp = request.form.get("timestamp")
 
-    image = request.files["image"]
-    image.filename = "{}/{}/fault_images/{}/{}".format(user_id, camera_id, name, image.filename)
+    analyzed_image = request.files["analyzed_image"]
+    analyzed_image.filename = "{}/{}/fault_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
 
-    image_link = send_to_s3(image, "lfiasimagestore")
+    image_link = send_to_s3(analyzed_image, "lfiasimagestore")
 
     try:
         newEvent = Event(user_id=user_id, camera_id=camera_id, name=name, type=event_type, timestamp=timestamp, image_link=image_link)
