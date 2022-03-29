@@ -205,14 +205,11 @@ def home():
     if request.method == 'POST':
         if request.form['submit_button'] == 'Facial Recognition':
             camera.mode = CameraMode.FACIAL_RECOGNITION
-            print()
         elif request.form['submit_button'] == 'Fault Detection':
             camera.mode = CameraMode.FAULT_DETECTION
-            print()
         else:
             pass # unknown
         camera.update()
-        print(camera.mode.value)
         return redirect(url_for('myapp.home'))
     return render_template("home.html", camera=camera, events=events)
 
