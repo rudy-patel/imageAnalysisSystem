@@ -14,6 +14,7 @@ import cv2
 from server import server_camera
 from importlib import import_module
 from flask_migrate import Migrate
+from apscheduler.schedulers.background import BackgroundScheduler
 
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
@@ -37,8 +38,35 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    return app
+    scheduler = BackgroundScheduler()
+    # in your case you could change seconds to hours
+    scheduler.add_job(update_camera_status, trigger='interval', seconds=10)
+    scheduler.start()
+    try:
+    # To keep the main thread alive
+        return app
+    except:
+    # shutdown if app occurs except 
+        scheduler.shutdown()
+
   
+
+def update_camera_status():
+
+    with app.app_context():
+        online_cameras = Camera.query.filter_by(status = CameraStatus.ONLINE).all()
+
+        print(online_cameras)
+        for cam in online_cameras:
+            if  datetime.now().timestamp() - cam.last_heartbeat.timestamp() > 60:
+                cam.status = CameraStatus.OFFLINE
+                cam.update()
+        
+
+   # print("This test runs every 10 seconds")
+
+
+
  # API Endpoints
 # TODO integrate with our token-based security to lock down these endpoints as per best practices
 
@@ -67,6 +95,7 @@ def new_event():
 def heartbeat(camera_id):
     #Renew heartbeat timestamp
     cam = Camera.query.filter_by(id = camera_id).first()
+    cam.status = CameraStatus.ONLINE
     cam.last_heartbeat = datetime.now()
     cam.update()
     #Get primary camera ID for user
@@ -268,4 +297,4 @@ def send_to_s3(file, bucket_name):
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
