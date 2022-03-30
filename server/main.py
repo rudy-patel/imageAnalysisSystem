@@ -150,6 +150,32 @@ def face_detected(camera_id):
         print(e)
         abort(422)
 
+# This is for posting a new ring fault analysis event
+@bp.route("/v1/<int:camera_id>/ring-fault-analysis-event", methods=["POST"])
+def fault_analysis(camera_id):
+
+    user_id = request.form.get("user_id")
+    name = request.form.get("name")
+    event_type = request.form.get("event_type")
+    timestamp = request.form.get("timestamp")
+
+    analyzed_image = request.files["analyzed_image"]
+    analyzed_image.filename = "{}/{}/ring_fault_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
+
+    image_link = send_to_s3(analyzed_image, "lfiasimagestore")
+
+    try:
+        newEvent = Event(user_id=user_id, camera_id=camera_id, name=name, type=event_type, timestamp=timestamp, image_link=image_link)
+        newEvent.create()
+        
+        return jsonify({
+            'success': True
+        })
+
+    except Exception as e:
+        print(e)
+        abort(422)
+
 # ------------
 
 

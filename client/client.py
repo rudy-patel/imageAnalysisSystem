@@ -15,6 +15,10 @@ import os
 #from server.enums.cameraEnums import CameraMode, CameraStatus
 from datetime import datetime
 from collections import defaultdict
+import circle_fault_detect as cfd
+import numpy as np
+
+
 
 class Client():
 
@@ -22,7 +26,7 @@ class Client():
         self.port = port
         self.ip = ip
         #For now, 1 = facial detection and 0 = fault detection
-        self.mode = "FACIAL_RECOGNITION"
+        self.mode = "FAULT_DETECT"
         self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, "5555"))
         #ON CONFIG the camera will get its ID and asscoiated user
         self.camera_id = 1
@@ -35,6 +39,7 @@ class Client():
         self.is_primary = True
         self.heartbeat_interval = 10
         self.last_heartbeat = 0
+        self.circle_detection_timeout = 5
         #Camera warmup sleep
         time.sleep(2.0)
 
@@ -48,8 +53,7 @@ class Client():
             if self.mode == "FACIAL_RECOGNITION":
                 frame = self.facial_req(frame, self.encode_data)
             else:
-                #Fault detection here
-                pass
+                frame = self.circle_detect(frame)
             if self.is_primary:
                 self.sender.send_image(self.camera_id, frame)
 
@@ -69,6 +73,28 @@ class Client():
                 print(new_data)
             except:
                 return
+
+    
+    def circle_detect(self, frame):
+        now = int(time.time())
+        if now - self.timeouts["circle_detect"] < self.circle_detection_timeout:
+            return frame
+        
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.2, 100)
+        # ensure at least some circles were found
+        if circles is not None:
+            # convert the (x, y) coordinates and radius of the circles to integers
+            circles = np.round(circles[0, :]).astype("int")
+            # loop over the (x, y) coordinates and radius of the circles
+            for (x, y, r) in circles:
+                # draw the circle in the output image, then draw a rectangle
+                # corresponding to the center of the circle
+                cv2.circle(frame, (x, y), r, (0, 255, 0), 4)
+                cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+                print("Circle detected")
+        return frame
+        
             
 
     #Send a POST request to the server event route
