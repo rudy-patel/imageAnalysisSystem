@@ -112,7 +112,7 @@ def heartbeat(camera_id):
 @bp.route("/make_primary/<int:camera_id>")
 @login_required
 def make_primary(camera_id):
-    user = Users.query.filter_by(id = current_user.id)
+    user = Users.query.filter_by(id = current_user.id).first()
     user.primary_camera = camera_id
     user.update()
     return redirect(url_for('myapp.cameras'))
