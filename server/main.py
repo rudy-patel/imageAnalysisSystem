@@ -24,7 +24,6 @@ migrate = Migrate()
 
 loginManager = LoginManager()
 
-#stream_frame = None
 camera_stream = None  
 
 def create_app():
@@ -224,7 +223,6 @@ def timestamp_to_string(obj):
 @bp.route("/", methods=['GET', 'POST'])
 @login_required
 def home():
-    print("HOME")
     events = Event.query.filter_by(user_id=current_user.id).order_by(Event.timestamp.desc()).limit(3).all()
     camera = Camera.query.filter_by(id=current_user.primary_camera).first()
     if request.method == 'POST':
@@ -240,7 +238,6 @@ def home():
 
 @bp.route("/login", methods=['GET', 'POST'])
 def login():
-    print('LOGIN')
     form = LoginForm()
 
     if form.validate_on_submit():
