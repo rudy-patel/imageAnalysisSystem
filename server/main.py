@@ -27,8 +27,10 @@ def create_app():
 
     app.config['SECRET_KEY'] = 'imageanalysissystem'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
-
+    
+    
     Bootstrap(app)
+    
 
     loginManager.init_app(app)
     loginManager.login_view = 'myapp.login'
@@ -96,8 +98,14 @@ def heartbeat(camera_id):
     cam.status = CameraStatus.ONLINE
     cam.last_heartbeat = datetime.now()
     cam.update()
+    
+    user = Users.query.filter_by(id = cam.user_id).first()
+    if user.primary_camera == cam.id:
+        is_primary = True
+    else:
+        is_primary = False
     #Get primary camera ID for user
-    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': True, 'encodings': None})
+    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': None})
 
 
 
@@ -200,6 +208,7 @@ def timestamp_to_string(obj):
 @bp.route("/", methods=['GET', 'POST'])
 @login_required
 def home():
+    print("HOME")
     events = Event.query.filter_by(user_id=current_user.id).order_by(Event.timestamp.desc()).limit(3).all()
     camera = Camera.query.filter_by(id=current_user.primary_camera).first()
     if request.method == 'POST':
@@ -215,13 +224,14 @@ def home():
 
 @bp.route("/login", methods=['GET', 'POST'])
 def login():
+    print('LOGIN')
     form = LoginForm()
 
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
         if user:
             if check_password_hash(user.password, form.password.data):
-                login_user(user)
+                login_user(user, remember=True, force=True)
                 return redirect(url_for('myapp.home'))
         flash("Invalid email/password")
     return render_template("login.html", form=form)

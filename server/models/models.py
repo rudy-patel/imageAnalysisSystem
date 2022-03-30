@@ -19,6 +19,9 @@ class Users(db.Model, UserMixin):
     def create(self):
         db.session.add(self)
         db.session.commit()
+    
+    def get_id(self):
+        return self.id
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
