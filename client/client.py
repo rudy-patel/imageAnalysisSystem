@@ -48,7 +48,7 @@ class Client():
         #Main loop
         while True:
             #Send heartbeat
-            #self.heartbeat()
+            self.heartbeat()
             frame = self.vs.read()
             if self.mode == "FACIAL_RECOGNITION":
                 frame = self.facial_req(frame, self.encode_data)
@@ -93,33 +93,6 @@ class Client():
                 print("Circle detected")
         return frame
         
-        
-    
-    def circle_fault_detect(self, frame):
-        print("Attempting fault detection")
-        stamp = int(time.time())
-        #Check timeout
-        if stamp - self.timeouts["fault_detect"] < self.fault_detection_timeout:
-            return
-        print("Timeout check passed")
-        #convert to jpg
-        #theImage = cv2.imdecode(frame, cv2.IMREAD_GRAYSCALE)
-        theImage = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        threshold = cfd.findThreshold(theImage)
-        theImage = cfd.thresholdImage(theImage, threshold)
-        theImage = cfd.applyBinaryMorph(theImage)
-        labeled_frame = cfd.applyImageCCL(theImage)
-        is_defective, frame = cfd.renderLabeledImage(labeled_frame)
-        
-        if is_defective:
-            print("Send fault detect event")
-            #send event
-        else:
-            print("No fault detected")
-            
-        self.timeouts["fault_detect"] = int(time.time())
-            
-
             
 
     #Send a POST request to the server event route
