@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from server.enums.cameraEnums import CameraMode, CameraStatus
 from server.enums.eventEnums import EventType
 from server.models.models import Users, Event, Camera
@@ -37,6 +38,10 @@ def create_app():
     from server.models.models import db
     db.init_app(app)
     migrate.init_app(app, db)
+
+    app.jinja_env.filters['enum_to_string'] = enum_to_string
+    app.jinja_env.filters['timestamp_to_string'] = timestamp_to_string
+    app.jinja_env.filters['camera_name_from_id'] = camera_name_from_id
 
     scheduler = BackgroundScheduler()
     # in your case you could change seconds to hours
@@ -208,14 +213,36 @@ def testAddCamera():
 
     return redirect(url_for('myapp.home'))
 
+def enum_to_string(obj):
+    if isinstance(obj, Enum):
+        return obj.value
+
+    # For all other types, let Jinja use default behavior
+    return obj
+
+def timestamp_to_string(obj):
+    return obj.strftime("%d-%b-%Y %I:%M %p")
+
+def camera_name_from_id(obj):
+    camera = Camera.query.filter_by(id=obj).first()
+    return camera.name
+
 @bp.route("/home")
-@bp.route("/")
+@bp.route("/", methods=['GET', 'POST'])
 @login_required
 def home():
-    events = Event.query.order_by(Event.timestamp.desc()).limit(3).all()
-    for event in events:
-        event.type = event.type.value
-    return render_template("home.html", name=current_user.name, events=events)
+    events = Event.query.filter_by(user_id=current_user.id).order_by(Event.timestamp.desc()).limit(3).all()
+    camera = Camera.query.filter_by(id=current_user.primary_camera).first()
+    if request.method == 'POST':
+        if request.form['submit_button'] == 'Facial Recognition':
+            camera.mode = CameraMode.FACIAL_RECOGNITION
+        elif request.form['submit_button'] == 'Fault Detection':
+            camera.mode = CameraMode.FAULT_DETECTION
+        else:
+            pass # unknown
+        camera.update()
+        return redirect(url_for('myapp.home'))
+    return render_template("home.html", camera=camera, events=events)
 
 @bp.route("/login", methods=['GET', 'POST'])
 def login():
@@ -258,28 +285,19 @@ def logout():
 @bp.route("/events")
 @login_required
 def events():
-    events = Event.query.order_by(Event.timestamp.desc()).all()
-    for event in events:
-        event.type = event.type.value
-        event.timestamp = event.timestamp.strftime("%d-%b-%Y %I:%M %p")
+    events = Event.query.filter_by(user_id=current_user.id).order_by(Event.timestamp.desc()).all()
     return render_template("events.html", events=events)
 
 @bp.route("/view_event/<int:event_id>")
 @login_required
 def event_view(event_id):
     event = Event.query.filter_by(id=event_id).first()
-    event.type = event.type.value
-    event.timestamp = event.timestamp.strftime("%d-%b-%Y %I:%M %p")
     return render_template("event_view.html", event=event)
 
 @bp.route("/cameras")
 @login_required
 def cameras():
-    cameras = Camera.query.order_by(Camera.status).all()
-    for camera in cameras:
-        camera.status = camera.status.value
-        camera.mode = camera.mode.value
-        camera.last_heartbeat = camera.last_heartbeat.strftime("%d-%b-%Y %I:%M %p")
+    cameras = Camera.query.filter_by(user_id=current_user.id).order_by(Camera.status).all()
     return render_template("cameras.html", cameras=cameras)
 
 @bp.route("/train", methods=['GET', 'POST'])
@@ -298,6 +316,31 @@ def train():
             return redirect("myapp.home")
     
     return render_template("train.html", form=form)
+
+@bp.route("/download/<int:event_id>")
+@login_required
+def download(event_id):
+    event = Event.query.filter_by(id=event_id).first()
+    
+    session = boto3.Session(profile_name='default')
+    s3_client = session.client('s3')
+
+    try:
+        bucket_name = "lfiasimagestore"
+        file_name = "event-" + str(event_id) + ".jpg"
+        object_name = event.image_link.split(".com/",1)[1] 
+
+        file = s3_client.get_object(Bucket=bucket_name, Key=object_name)
+        
+        return Response(
+            file['Body'].read(),
+            mimetype='text/plain',
+            headers={"Content-Disposition": "attachment;filename="+file_name}
+        )
+
+    except Exception as e:
+        print("Something Happened: ", e)
+        return e
 
 def send_to_s3(file, bucket_name):
         session = boto3.Session(profile_name='default')

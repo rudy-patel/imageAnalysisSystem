@@ -6,19 +6,22 @@
             <div class="row justify-content-center">
                 <img src="{{event.image_link}}"></img>
             </div>
+            <div class="row justify-content-center">
+                <a role="button" class="btn btn-primary" href="{{ url_for('myapp.download' , event_id=event.id) }}">Download image</a>
+            </div>
         </div>
         <div class="col">
             <div class="row justify-content-start">
-                <h3>Camera: {{event.camera_id}}</h3>
+                <h3>Camera: {{event.camera_id | camera_name_from_id}}</h3>
             </div>
             <div class="row justify-content-start">
-                <h3>Type: {{event.type}}</h3>
+                <h3>Type: {{event.type | enum_to_string}}</h3>
             </div>
             <div class="row justify-content-start">
                 <h3>Name: {{event.name}}</h3>
             </div>
             <div class="row justify-content-start">
-                <h3>Time: {{event.timestamp}}</h3>
+                <h3>Time: {{event.timestamp | timestamp_to_string}}</h3>
             </div>
         </div>
     </div>

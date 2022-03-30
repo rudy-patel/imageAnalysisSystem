@@ -18,10 +18,10 @@
             <tbody>
               {% for camera in cameras %}
               <tr>
-                <td>{{camera.status}}</td>
+                <td>{{camera.status | enum_to_string}}</td>
                 <td>{{camera.name}}</td>
-                <td>{{camera.mode}}</td>
-                <td>{{camera.last_heartbeat}}</td>
+                <td>{{camera.mode | enum_to_string}}</td>
+                <td>{{camera.last_heartbeat | timestamp_to_string}}</td>
                 <td>
                     <button type="button" class="btn btn-primary">Select</button>
                     <button type="button" class="btn btn-primary">Delete</button>

@@ -18,10 +18,10 @@
             <tbody>
               {% for event in events %}
               <tr>
-                <td>Camera #{{event.camera_id}}</td>
-                <td>{{event.type}}</td>
+                <td>{{event.camera_id | camera_name_from_id}}</td>
+                <td>{{event.type | enum_to_string}}</td>
                 <td>{{event.name}}</td>
-                <td>{{event.timestamp}}</td>
+                <td>{{event.timestamp | timestamp_to_string}}</td>
                 <td>
                     <a role="button" class="btn btn-primary" href="{{ url_for('myapp.event_view' , event_id=event.id) }}">View Event</a>
                 </td>
