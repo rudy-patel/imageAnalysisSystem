@@ -31,5 +31,5 @@ def test_heartbeat(client):
     
     assert response_data['camera_id'] == cameraID
     assert response_data['mode'] == "FACIAL_RECOGNITION"
-    assert response_data['is_primary'] == True
+    assert response_data['is_primary'] == False
     assert response_data['encodings'] == None
