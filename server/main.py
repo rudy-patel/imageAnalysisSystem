@@ -72,13 +72,9 @@ def generate_face_encodings():
     s3 = boto3.resource('s3')    
     bucket_name = 'lfiasimagestore'
     
-    # for item in s3.Bucket(bucket_name).objects.filter(Prefix="{}/face_training/".format(current_user.id)):
-
-    #     image = url_to_image("https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, item.key))
-
-    image = url_to_image("https://pyimagesearch.com/wp-content/uploads/2015/01/opencv_logo.png")
-    print("supposedly working")
-
+    for item in s3.Bucket(bucket_name).objects.filter(Prefix="{}/face_training/".format(current_user.id)):
+        image = url_to_image("https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, item.key))
+        
 
 def url_to_image(url):
     # Download the image into local memory instead of disk
