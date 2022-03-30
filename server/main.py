@@ -16,6 +16,8 @@ from server import server_camera
 from importlib import import_module
 from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
+import numpy as np
+import urllib.request
 
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
@@ -63,7 +65,29 @@ def update_camera_status():
             if  datetime.now().timestamp() - cam.last_heartbeat.timestamp() > 60:
                 cam.status = CameraStatus.OFFLINE
                 cam.update()
+
+# In progress: threaded encodings.pickle file generation to update the client-side
+# recognized faces
+def generate_face_encodings():
+    s3 = boto3.resource('s3')    
+    bucket_name = 'lfiasimagestore'
     
+    # for item in s3.Bucket(bucket_name).objects.filter(Prefix="{}/face_training/".format(current_user.id)):
+
+    #     image = url_to_image("https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, item.key))
+
+    image = url_to_image("https://pyimagesearch.com/wp-content/uploads/2015/01/opencv_logo.png")
+    print("supposedly working")
+
+
+def url_to_image(url):
+    # Download the image into local memory instead of disk
+    resp = urllib.request.urlopen(url).read()
+    image = np.asarray(bytearray(resp), dtype="uint8")
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    # return the image
+    return image
+
 
  # API Endpoints
 # TODO integrate with our token-based security to lock down these endpoints as per best practices
@@ -278,8 +302,16 @@ def train():
         if form.file.data.filename != '':
             if form.file:
                 form.file.data.filename = secure_filename(form.file.data.filename)
+
+                if form.personSelect.data:
+                    form.file.data.filename = "{}/face_training/{}/{}".format(current_user.id, form.personSelect.data[0], form.file.data.filename)
+                else:
+                    form.file.data.filename = "{}/face_training/{}/{}".format(current_user.id, form.newPersonName.data, form.file.data.filename)
+
                 filepath = send_to_s3(form.file.data, "lfiasimagestore")
                 flash("Saved image successfully at: {}".format(str(filepath)))
+                # TODO: spin off a thread to handle this function
+                generate_face_encodings()
                 return redirect(url_for('myapp.train'))
         else:
             return redirect("myapp.home")
