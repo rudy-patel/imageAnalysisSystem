@@ -16,10 +16,8 @@ from server import server_camera
 from importlib import import_module
 from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
-import imagezmq
-import threading
-import time
-import atexit
+import numpy as np
+
 
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
@@ -55,22 +53,6 @@ def create_app():
     # in your case you could change seconds to hours
     scheduler.add_job(update_camera_status, trigger='interval', seconds=60)
     scheduler.start()
-
-    def frame_thread():
-        print("Starting frame thread")
-        global stream_frame
-        stream_frame = "FRAME"
-        while True:
-            print(stream_frame)
-
-        #open imageHub
-        #While true
-            #recive image
-            #send reply
-            #set global frame
-
-    #thread = threading.Thread(target=frame_thread)
-    #thread.start()
 
     try:
     # To keep the main thread alive
@@ -184,11 +166,11 @@ def test():
     elif (request.method == "GET"):
         return jsonify({'data': getData})
 
+
 #Generating funtion for video stream, produces frames from the PI one by one 
-def generate_frame(camera_stream):
-
+def generate_frame(camera_stream, primary_camera):
+    
     cam_id, frame = camera_stream.get_frame()
-
     frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
     return (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -196,13 +178,13 @@ def generate_frame(camera_stream):
 
 
 #Video stream, should be the soucre of the homepage video image
-@bp.route('/video_feed')
-def video_feed():
+@bp.route('/video_feed/<int:primary_camera>')
+def video_feed(primary_camera):
     global camera_stream
-
+    
     if not camera_stream:
         camera_stream = server_camera.Camera()
-    resp = Response(generate_frame(camera_stream=camera_stream),
+    resp = Response(generate_frame(camera_stream, primary_camera),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
     resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
     resp.headers["Pragma"] = "no-cache"
