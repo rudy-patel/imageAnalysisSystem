@@ -15,7 +15,6 @@ import os
 #from server.enums.cameraEnums import CameraMode, CameraStatus
 from datetime import datetime
 from collections import defaultdict
-import circle_fault_detect as cfd
 import numpy as np
 
 
