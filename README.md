@@ -4,8 +4,8 @@
 ![Repo Size](https://img.shields.io/github/repo-size/rudy-patel/imageAnalysisSystem)
 [![License](https://img.shields.io/github/license/rudy-patel/imageAnalysisSystem)](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-# Low-Footprint Image Analysis System
-This system is a low-footprint versatile system involving hardware and software developments for recognition of objects and/or faces through machine learning algorithms.
+# Image Analysis System
+This system is a low-footprint versatile application involving hardware and software componenets for recognition of objects and/or faces through machine learning algorithms.
 
 ### First time setup
 This project runs inside a Python virtual environment. To set up your environment, follow these steps:
