@@ -17,10 +17,12 @@ To setup the hardware unit, follow the instructions [here](https://github.com/ru
 On **Linux/MacOS**:
 - Run `source env/bin/activate` to **start** the Python virtual environment.
 - Run `deactivate` to **stop** the Python virtual environment.
+- If you need to set an environment variable use: `export <variable>=<value>`. This is only saved in your current terminal.
 
 On **Windows**:
 - Run `.\env\Scripts\activate` to **start** the Python virtual environment.
 - Run `deactivate` to **stop** the Python virtual environment.
+- If you need to set an environment variable use: `set <variable>=<value>`. This is only saved in your current terminal.
 
 You have now created the virtual environment in the project directory, continue following the steps to run the server.
 
