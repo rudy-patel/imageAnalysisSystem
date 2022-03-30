@@ -16,19 +16,25 @@ from server import server_camera
 from importlib import import_module
 from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
+import numpy as np
+
 
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
 
 loginManager = LoginManager()
 
+camera_stream = None  
+
 def create_app():
     app = Flask(__name__)
 
     app.config['SECRET_KEY'] = 'imageanalysissystem'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
-
+    
+    
     Bootstrap(app)
+    
 
     loginManager.init_app(app)
     loginManager.login_view = 'myapp.login'
@@ -47,6 +53,7 @@ def create_app():
     # in your case you could change seconds to hours
     scheduler.add_job(update_camera_status, trigger='interval', seconds=60)
     scheduler.start()
+
     try:
     # To keep the main thread alive
         return app
@@ -54,7 +61,6 @@ def create_app():
     # shutdown if app occurs except 
         scheduler.shutdown()
 
-  
 
 def update_camera_status():
 
@@ -97,9 +103,24 @@ def heartbeat(camera_id):
     cam.status = CameraStatus.ONLINE
     cam.last_heartbeat = datetime.now()
     cam.update()
+    
+    user = Users.query.filter_by(id = cam.user_id).first()
+    if user.primary_camera == cam.id:
+        is_primary = True
+    else:
+        is_primary = False
     #Get primary camera ID for user
-    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': True, 'encodings': None})
+    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': None})
 
+
+#Update the users primary camera
+@bp.route("/make_primary/<int:camera_id>")
+@login_required
+def make_primary(camera_id):
+    user = Users.query.filter_by(id = current_user.id).first()
+    user.primary_camera = camera_id
+    user.update()
+    return redirect(url_for('myapp.cameras'))
 
 
 
@@ -145,11 +166,11 @@ def test():
     elif (request.method == "GET"):
         return jsonify({'data': getData})
 
+
 #Generating funtion for video stream, produces frames from the PI one by one 
-def generate_frame(camera_stream):
-
+def generate_frame(camera_stream, primary_camera):
+    
     cam_id, frame = camera_stream.get_frame()
-
     frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
     return (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -157,17 +178,19 @@ def generate_frame(camera_stream):
 
 
 #Video stream, should be the soucre of the homepage video image
-@bp.route('/video_feed')
-def video_feed():
-
-    camera_stream = server_camera.Camera
-
-    resp = Response(generate_frame(camera_stream=camera_stream()),
+@bp.route('/video_feed/<int:primary_camera>')
+def video_feed(primary_camera):
+    global camera_stream
+    
+    if not camera_stream:
+        camera_stream = server_camera.Camera()
+    resp = Response(generate_frame(camera_stream, primary_camera),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
     resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
     resp.headers["Pragma"] = "no-cache"
     resp.headers["Expires"] = "0"
     return resp 
+
 
 @bp.route("/addEvent")
 @login_required
@@ -226,7 +249,7 @@ def login():
         user = Users.query.filter_by(email=form.email.data).first()
         if user:
             if check_password_hash(user.password, form.password.data):
-                login_user(user)
+                login_user(user, remember=True, force=True)
                 return redirect(url_for('myapp.home'))
         flash("Invalid email/password")
     return render_template("login.html", form=form)
