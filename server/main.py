@@ -108,6 +108,15 @@ def heartbeat(camera_id):
     return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': None})
 
 
+#Update the users primary camera
+@bp.route("/make_primary/<int:camera_id>")
+@login_required
+def make_primary(camera_id):
+    user = Users.query.filter_by(id = current_user.id)
+    user.primary_camera = camera_id
+    user.update()
+    return redirect(url_for('myapp.cameras'))
+
 
 
 # This is for posting a new facial recognition
@@ -175,6 +184,7 @@ def video_feed():
     resp.headers["Pragma"] = "no-cache"
     resp.headers["Expires"] = "0"
     return resp 
+
 
 @bp.route("/addEvent")
 @login_required

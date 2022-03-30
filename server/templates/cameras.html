@@ -23,7 +23,7 @@
                 <td>{{camera.mode | enum_to_string}}</td>
                 <td>{{camera.last_heartbeat | timestamp_to_string}}</td>
                 <td>
-                    <button type="button" class="btn btn-primary">Select</button>
+                    <a role="button" class="btn btn-primary" href="{{ url_for('myapp.make_primary', camera_id=camera.id) }}">Make Primary</a>
                     <button type="button" class="btn btn-primary">Delete</button>
                 </td>
               </tr>
