@@ -41,6 +41,7 @@ def create_app():
 
     app.jinja_env.filters['enum_to_string'] = enum_to_string
     app.jinja_env.filters['timestamp_to_string'] = timestamp_to_string
+    app.jinja_env.filters['camera_name_from_id'] = camera_name_from_id
 
     scheduler = BackgroundScheduler()
     # in your case you could change seconds to hours
@@ -195,6 +196,10 @@ def enum_to_string(obj):
 
 def timestamp_to_string(obj):
     return obj.strftime("%d-%b-%Y %I:%M %p")
+
+def camera_name_from_id(obj):
+    camera = Camera.query.filter_by(id=obj).first()
+    return camera.name
 
 @bp.route("/home")
 @bp.route("/", methods=['GET', 'POST'])
