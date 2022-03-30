@@ -286,6 +286,31 @@ def train():
     
     return render_template("train.html", form=form)
 
+@bp.route("/download/<int:event_id>")
+@login_required
+def download(event_id):
+    event = Event.query.filter_by(id=event_id).first()
+    
+    session = boto3.Session(profile_name='default')
+    s3_client = session.client('s3')
+
+    try:
+        bucket_name = "lfiasimagestore"
+        file_name = "event-" + str(event_id) + ".jpg"
+        object_name = event.image_link.split(".com/",1)[1] 
+
+        file = s3_client.get_object(Bucket=bucket_name, Key=object_name)
+        
+        return Response(
+            file['Body'].read(),
+            mimetype='text/plain',
+            headers={"Content-Disposition": "attachment;filename="+file_name}
+        )
+
+    except Exception as e:
+        print("Something Happened: ", e)
+        return e
+
 def send_to_s3(file, bucket_name):
         session = boto3.Session(profile_name='default')
         s3 = session.client('s3')
