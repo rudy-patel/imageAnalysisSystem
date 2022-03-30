@@ -249,8 +249,9 @@ def renderLabeledRing(labeledImage):
         @param 	(string) message 	The message to output.
 '''
 def outputDebug(message, prefix = ''):
-    if DEBUG_OUTPUTS and message:
-        print(prefix + "  [" + str(CURRENT_RING_ID) + "]: " + str(message))
+    #if DEBUG_OUTPUTS and message:
+        #print(prefix + "  [" + str(CURRENT_RING_ID) + "]: " + str(message))
+    pass
 
 '''
     Modified this to be a ring fault detection model in our framework
