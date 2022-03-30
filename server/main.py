@@ -16,11 +16,18 @@ from server import server_camera
 from importlib import import_module
 from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
+import imagezmq
+import threading
+import time
+import atexit
 
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
 
 loginManager = LoginManager()
+
+#stream_frame = None
+camera_stream = None  
 
 def create_app():
     app = Flask(__name__)
@@ -48,6 +55,23 @@ def create_app():
     # in your case you could change seconds to hours
     scheduler.add_job(update_camera_status, trigger='interval', seconds=60)
     scheduler.start()
+
+    def frame_thread():
+        print("Starting frame thread")
+        global stream_frame
+        stream_frame = "FRAME"
+        while True:
+            print(stream_frame)
+
+        #open imageHub
+        #While true
+            #recive image
+            #send reply
+            #set global frame
+
+    #thread = threading.Thread(target=frame_thread)
+    #thread.start()
+
     try:
     # To keep the main thread alive
         return app
@@ -55,7 +79,6 @@ def create_app():
     # shutdown if app occurs except 
         scheduler.shutdown()
 
-  
 
 def update_camera_status():
 
@@ -175,10 +198,11 @@ def generate_frame(camera_stream):
 #Video stream, should be the soucre of the homepage video image
 @bp.route('/video_feed')
 def video_feed():
+    global camera_stream
 
-    camera_stream = server_camera.Camera
-
-    resp = Response(generate_frame(camera_stream=camera_stream()),
+    if not camera_stream:
+        camera_stream = server_camera.Camera()
+    resp = Response(generate_frame(camera_stream=camera_stream),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
     resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
     resp.headers["Pragma"] = "no-cache"
