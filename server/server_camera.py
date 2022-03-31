@@ -67,11 +67,6 @@ class Camera():
     def get_frame(cls):
         # It is possible to use last_access to setup a timeout for the thread
         # Camera.last_access = time.time()
-
-        # wait for a signal from the camera thread
-
-        #cls.event.wait()
-        #cls.event.clear()
         return Camera.frame
 
 
@@ -96,7 +91,6 @@ class Camera():
             
             try:
                 Camera.frame = new_frame
-                #Camera.event.set()
 
             except Exception as e:
                 image_hub.zmq_socket.close()
