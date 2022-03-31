@@ -172,7 +172,11 @@ def test():
 def generate_frame(camera_stream, primary_camera):
     
     cam_id, frame = camera_stream.get_frame()
-    frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
+    if cam_id == primary_camera:
+        frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
+    else:
+        black_img = np.zeros((512, 512, 1), dtype = "uint8")
+        frame = cv2.imencode('.jpg', black_img)[1].tobytes()
     return (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
