@@ -19,7 +19,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import numpy as np
 import threading
 
-
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
 
