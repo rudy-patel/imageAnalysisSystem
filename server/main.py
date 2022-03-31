@@ -168,16 +168,16 @@ def face_detected(camera_id):
         print(e)
         abort(422)
 
-# This is for posting a new ring fault analysis event
-@bp.route("/v1/<int:camera_id>/ring-fault-analysis-event", methods=["POST"])
-def fault_analysis(camera_id):
+# This is for posting a new ring shape analysis event
+@bp.route("/v1/<int:camera_id>/ring-shape-analysis-event", methods=["POST"])
+def shape_analysis(camera_id):
     user_id = request.form.get("user_id")
     name = request.form.get("name")
     event_type = request.form.get("event_type")
     timestamp = request.form.get("timestamp")
 
     analyzed_image = request.files["analyzed_image"]
-    analyzed_image.filename = "{}/{}/ring_fault_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
+    analyzed_image.filename = "{}/{}/ring_shape_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
     image_link = send_to_s3(analyzed_image, "lfiasimagestore")
 
     try:
@@ -261,8 +261,8 @@ def home():
     if request.method == 'POST':
         if request.form['submit_button'] == 'Facial Recognition':
             camera.mode = CameraMode.FACIAL_RECOGNITION
-        elif request.form['submit_button'] == 'Fault Detection':
-            camera.mode = CameraMode.FAULT_DETECTION
+        elif request.form['submit_button'] == 'Shape Detection':
+            camera.mode = CameraMode.SHAPE_DETECTION
         else:
             pass # unknown
         

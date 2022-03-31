@@ -18,7 +18,7 @@ class Client():
     def __init__(self, ip, port):
         self.port = port
         self.ip = ip
-        self.mode = "FAULT_DETECT"
+        self.mode = "SHAPE_DETECT"
         self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, "5555"))
         self.camera_id = 1
         self.name = socket.gethostname()
