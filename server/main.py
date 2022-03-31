@@ -13,10 +13,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import boto3
 import cv2
 from server import server_camera
-from importlib import import_module
 from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
-import numpy as np
 
 
 bp = Blueprint('myapp', __name__)
@@ -32,10 +30,8 @@ def create_app():
     app.config['SECRET_KEY'] = 'imageanalysissystem'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
     
-    
     Bootstrap(app)
     
-
     loginManager.init_app(app)
     loginManager.login_view = 'myapp.login'
 
@@ -50,7 +46,6 @@ def create_app():
     app.jinja_env.filters['camera_name_from_id'] = camera_name_from_id
 
     scheduler = BackgroundScheduler()
-    # in your case you could change seconds to hours
     scheduler.add_job(update_camera_status, trigger='interval', seconds=60)
     scheduler.start()
 
@@ -61,9 +56,11 @@ def create_app():
     # shutdown if app occurs except 
         scheduler.shutdown()
 
+@loginManager.user_loader
+def loadUser(id):
+    return Users.query.get(int(id))
 
 def update_camera_status():
-
     with app.app_context():
         online_cameras = Camera.query.filter_by(status = CameraStatus.ONLINE).all()
         for cam in online_cameras:
@@ -71,31 +68,6 @@ def update_camera_status():
                 cam.status = CameraStatus.OFFLINE
                 cam.update()
     
-
- # API Endpoints
-# TODO integrate with our token-based security to lock down these endpoints as per best practices
-
-# This is a generic example that posts a new event
-@bp.route("/v1/events", methods=["POST"])
-def new_event(): 
-    data = jsonify(request.form).json
-    user_id = data["user_id"]
-    camera_id = data["camera_id"]
-    event_type = data["event_type"]
-    timestamp = data["timestamp"]
-
-    try:
-        newEvent = Event(user_id=user_id, camera_id=camera_id, type=event_type, timestamp=timestamp, name = "yo", image_link="bro")
-        newEvent.create()
-        return jsonify({
-            'success': True
-        })
-
-    except:
-        abort(422)
-
-
-
 @bp.route("/v1/heartbeat/<int:camera_id>", methods=["GET"])
 def heartbeat(camera_id):
     #Renew heartbeat timestamp
@@ -109,7 +81,7 @@ def heartbeat(camera_id):
         is_primary = True
     else:
         is_primary = False
-    #Get primary camera ID for user
+    
     return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': None})
 
 
@@ -120,6 +92,7 @@ def make_primary(camera_id):
     user = Users.query.filter_by(id = current_user.id).first()
     user.primary_camera = camera_id
     user.update()
+    
     return redirect(url_for('myapp.cameras'))
 
 
@@ -127,7 +100,6 @@ def make_primary(camera_id):
 # This is for posting a new facial recognition
 @bp.route("/v1/<int:camera_id>/facial-detection-event", methods=["POST"])
 def face_detected(camera_id):
-
     user_id = request.form.get("user_id")
     name = request.form.get("name")
     event_type = request.form.get("event_type")
@@ -135,7 +107,6 @@ def face_detected(camera_id):
 
     image = request.files["image"]
     image.filename = "{}/{}/face_images/{}/{}".format(user_id, camera_id, name, image.filename)
-
     image_link = send_to_s3(image, "lfiasimagestore")
 
     try:
@@ -145,7 +116,6 @@ def face_detected(camera_id):
         return jsonify({
             'success': True
         })
-
     except Exception as e:
         print(e)
         abort(422)
@@ -161,7 +131,6 @@ def fault_analysis(camera_id):
 
     analyzed_image = request.files["analyzed_image"]
     analyzed_image.filename = "{}/{}/ring_fault_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
-
     image_link = send_to_s3(analyzed_image, "lfiasimagestore")
 
     try:
@@ -171,17 +140,9 @@ def fault_analysis(camera_id):
         return jsonify({
             'success': True
         })
-
     except Exception as e:
         print(e)
         abort(422)
-
-# ------------
-
-
-@loginManager.user_loader
-def loadUser(id):
-    return Users.query.get(int(id))
 
 #Generating funtion for video stream, produces frames from the PI one by one 
 def generate_frame(camera_stream, primary_camera):
@@ -198,20 +159,20 @@ def video_feed(primary_camera):
     
     if not camera_stream:
         camera_stream = server_camera.Camera()
+    
     resp = Response(generate_frame(camera_stream, primary_camera),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+    
     resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
     resp.headers["Pragma"] = "no-cache"
     resp.headers["Expires"] = "0"
+    
     return resp 
-
 
 @bp.route("/addEvent")
 @login_required
 def testAddEvent():
-    
     newEvent = Event(user_id=current_user.id, camera_id=1, type=EventType.IMAGE_CAPTURE_SUCCESS, timestamp=datetime.now())
-
     newEvent.create()
 
     return redirect(url_for('myapp.home'))
@@ -244,6 +205,7 @@ def camera_name_from_id(id):
 def home():
     events = Event.query.filter_by(user_id=current_user.id).order_by(Event.timestamp.desc()).limit(3).all()
     camera = Camera.query.filter_by(id=current_user.primary_camera).first()
+    
     if request.method == 'POST':
         if request.form['submit_button'] == 'Facial Recognition':
             camera.mode = CameraMode.FACIAL_RECOGNITION
@@ -251,8 +213,11 @@ def home():
             camera.mode = CameraMode.FAULT_DETECTION
         else:
             pass # unknown
+        
         camera.update()
+        
         return redirect(url_for('myapp.home'))
+    
     return render_template("home.html", camera=camera, events=events)
 
 @bp.route("/login", methods=['GET', 'POST'])
@@ -261,11 +226,14 @@ def login():
 
     if form.validate_on_submit():
         user = Users.query.filter_by(email=form.email.data).first()
+        
         if user:
             if check_password_hash(user.password, form.password.data):
                 login_user(user, remember=True, force=True)
                 return redirect(url_for('myapp.home'))
+        
         flash("Invalid email/password")
+    
     return render_template("login.html", form=form)
 
 @bp.route("/signup", methods=['GET', 'POST'])
@@ -279,12 +247,12 @@ def signup():
 
         if not isUserExisting:
             newUser = Users(name=form.name.data, email= form.email.data, password=hashedPassword)
-
             newUser.create()
 
             return redirect(url_for('myapp.login'))
             
         flash("A user already exists with that email!")
+    
     return render_template("signup.html", form=form)
 
 @bp.route('/logout')
@@ -321,7 +289,9 @@ def train():
             if form.file:
                 form.file.data.filename = secure_filename(form.file.data.filename)
                 filepath = send_to_s3(form.file.data, "lfiasimagestore")
+                
                 flash("Saved image successfully at: {}".format(str(filepath)))
+                
                 return redirect(url_for('myapp.train'))
         else:
             return redirect("myapp.home")
@@ -356,6 +326,7 @@ def download(event_id):
 def send_to_s3(file, bucket_name):
         session = boto3.Session(profile_name='default')
         s3 = session.client('s3')
+        
         try:
             s3.upload_fileobj(
                 file,
@@ -367,7 +338,9 @@ def send_to_s3(file, bucket_name):
             )
         except Exception as e:
             print("Something Happened: ", e)
+            
             return e
+        
         return "https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, file.filename)
 
 if __name__ == "__main__":

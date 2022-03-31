@@ -27,6 +27,7 @@ class TrainingForm(FlaskForm):
         FileRequired(),
         FileAllowed(['jpg', 'jpeg'], 'Allowed file formats: .jpg, .jpeg!')
     ])
+    
     personSelect = SelectMultipleField('Select an existing person', 
                                choices=[
                                  ('Kanye', 'Kanye'), 

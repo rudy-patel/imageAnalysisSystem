@@ -1,7 +1,6 @@
-from flask import json, jsonify
-from server.models.models import Users, Event, Camera
+from flask import json
+from server.models.models import Users, Camera
 import datetime
-from flask_login import current_user
 
 def test_event(test_client):
     input_data = { 
