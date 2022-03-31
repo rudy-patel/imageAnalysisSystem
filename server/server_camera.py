@@ -76,11 +76,11 @@ class Camera():
     def get_frame(cls):
         #It is possible to use last_access to setup a timeout for the thread
         #Camera.last_access = time.time()
-
+        if Camera.frame == None:
+            return None, None
         # wait for a signal from the camera thread
         cls.event.wait()
         cls.event.clear()
-
         return Camera.frame
 
 

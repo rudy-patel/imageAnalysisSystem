@@ -7,7 +7,7 @@ from flask import Flask, Blueprint, redirect, url_for, render_template, request,
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from server.Forms import LoginForm, SignUpForm, TrainingForm
-from os import environ
+from os import environ, path
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import boto3
@@ -169,12 +169,15 @@ def test():
 
 #Generating funtion for video stream, produces frames from the PI one by one 
 def generate_frame(camera_stream, primary_camera):
-    
+    print("Generating frame")
     cam_id, frame = camera_stream.get_frame()
+    print("got frame")
     if cam_id == primary_camera:
         frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
     else:
-        black_img = np.zeros((512, 512, 1), dtype = "uint8")
+        print("Send black image")
+        file_name = path.join(path.dirname(__file__), 'black_img.jpeg')
+        black_img = cv2.imread(file_name)
         frame = cv2.imencode('.jpg', black_img)[1].tobytes()
     return (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -186,7 +189,7 @@ def generate_frame(camera_stream, primary_camera):
 def video_feed(primary_camera):
     global camera_stream
     print(threading.active_count())
-
+    
     if not camera_stream:
         camera_stream = server_camera.Camera()
     resp = Response(generate_frame(camera_stream, primary_camera),
