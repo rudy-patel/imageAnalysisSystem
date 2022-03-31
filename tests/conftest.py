@@ -2,8 +2,8 @@ import flask
 import pytest
 from flask import template_rendered
 from server.main import create_app
-
-
+from flask_login import login_user
+from server.models.models import Users
 
 @pytest.fixture()
 def app():
@@ -37,7 +37,9 @@ def test_client():
     # Establish an application context before running the tests.
     ctx = flask_app.app_context()
     ctx.push()
- 
+    
+    # auto_login()
+
     yield testing_client  # this is where the testing happens!
  
     ctx.pop()
@@ -54,3 +56,12 @@ def captured_templates(app):
         yield recorded
     finally:
         template_rendered.disconnect(record, app)
+
+# @app.route('/auto_login')
+def auto_login():
+    user = ( Users
+             .query
+             .filter_by(name="API_TEST")
+             .first())
+    login_user(user, remember=True)
+    return "ok"

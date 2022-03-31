@@ -183,16 +183,6 @@ def fault_analysis(camera_id):
 def loadUser(id):
     return Users.query.get(int(id))
 
-@bp.route("/test", methods=["GET", "POST"])
-def test():
-    getData = 'get_request'
-    postData = 'post_request'
-    if(request.method == "POST"):
-        return jsonify({'data': postData})
-    elif (request.method == "GET"):
-        return jsonify({'data': getData})
-
-
 #Generating funtion for video stream, produces frames from the PI one by one 
 def generate_frame(camera_stream, primary_camera):
     
@@ -200,8 +190,6 @@ def generate_frame(camera_stream, primary_camera):
     frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
     return (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-
 
 #Video stream, should be the soucre of the homepage video image
 @bp.route('/video_feed/<int:primary_camera>')
@@ -231,7 +219,7 @@ def testAddEvent():
 @bp.route("/addCamera")
 @login_required
 def testAddCamera():
-    newCamera = Camera(user_id=current_user.id, name="Camera #" + str(current_user.id), status=CameraStatus.OFFLINE, mode=CameraMode.FACIAL_RECOGNITION)
+    newCamera = Camera(user_id=5, name="API_TEST_CAM", status=CameraStatus.OFFLINE, mode=CameraMode.FACIAL_RECOGNITION)
     newCamera.create()
 
     return redirect(url_for('myapp.home'))
@@ -246,8 +234,8 @@ def enum_to_string(obj):
 def timestamp_to_string(obj):
     return obj.strftime("%d-%b-%Y %I:%M %p")
 
-def camera_name_from_id(obj):
-    camera = Camera.query.filter_by(id=obj).first()
+def camera_name_from_id(id):
+    camera = Camera.query.filter_by(id=id).first()
     return camera.name
 
 @bp.route("/home")
