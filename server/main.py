@@ -69,8 +69,8 @@ def update_camera_status():
                 cam.status = CameraStatus.OFFLINE
                 cam.update()
 
-# In progress: threaded encodings.pickle file generation to update the client-side
-# recognized faces
+# Generate face encodings using all images in the current user's face_training name-labelled
+# S3 bucket 'folders'
 def generate_face_encodings():
     s3 = boto3.resource('s3')    
     bucket_name = 'lfiasimagestore'
@@ -101,6 +101,7 @@ def generate_face_encodings():
             
     # dump the facial encodings + names to disk
     data = {"encodings": knownEncodings, "names": knownNames}
+    
     f = open("encodings.pickle", "wb")
     f.write(pickle.dumps(data))
     f.close()      
@@ -110,9 +111,10 @@ def generate_face_encodings():
 def url_to_image(url):
     # Download the image into local memory instead of disk
     resp = urllib.request.urlopen(url).read()
+    
     image = np.asarray(bytearray(resp), dtype="uint8")
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-    # return the image
+
     return image
 
   
