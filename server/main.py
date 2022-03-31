@@ -244,7 +244,7 @@ def enum_to_string(obj):
     return obj
 
 def timestamp_to_string(obj):
-    return obj.strftime("%d-%b-%Y %I:%M %p")
+    return obj.strftime("%d-%b-%Y %H:%M")
 
 def camera_name_from_id(obj):
     camera = Camera.query.filter_by(id=obj).first()
