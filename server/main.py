@@ -339,7 +339,7 @@ def train():
 
                 filepath = send_to_s3(form.file.data, "lfiasimagestore")
                 
-                flash("Saved image successfully at: {}".format(str(filepath)))
+                flash("Image has been uploaded, training in progress...")
 
                 generate_face_encodings()
 
