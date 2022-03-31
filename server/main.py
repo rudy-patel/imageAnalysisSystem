@@ -219,7 +219,7 @@ def testAddEvent():
 @bp.route("/addCamera")
 @login_required
 def testAddCamera():
-    newCamera = Camera(user_id=5, name="API_TEST_CAM", status=CameraStatus.OFFLINE, mode=CameraMode.FACIAL_RECOGNITION)
+    newCamera = Camera(user_id=current_user.id, name="Camera #" + str(current_user.id), status=CameraStatus.OFFLINE, mode=CameraMode.FACIAL_RECOGNITION)
     newCamera.create()
 
     return redirect(url_for('myapp.home'))

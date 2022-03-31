@@ -38,8 +38,6 @@ def test_client():
     ctx = flask_app.app_context()
     ctx.push()
     
-    # auto_login()
-
     yield testing_client  # this is where the testing happens!
  
     ctx.pop()
@@ -56,12 +54,3 @@ def captured_templates(app):
         yield recorded
     finally:
         template_rendered.disconnect(record, app)
-
-# @app.route('/auto_login')
-def auto_login():
-    user = ( Users
-             .query
-             .filter_by(name="API_TEST")
-             .first())
-    login_user(user, remember=True)
-    return "ok"
