@@ -16,7 +16,6 @@ from server import server_camera
 from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
 
-
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
 
@@ -50,11 +49,9 @@ def create_app():
     scheduler.start()
 
     try:
-    # To keep the main thread alive
         return app
     except:
-    # shutdown if app occurs except 
-        scheduler.shutdown()
+        scheduler.shutdown() # shutdown if app occurs except
 
 @loginManager.user_loader
 def loadUser(id):
@@ -70,10 +67,9 @@ def update_camera_status():
     
 @bp.route("/v1/heartbeat/<int:camera_id>", methods=["GET"])
 def heartbeat(camera_id):
-    #Renew heartbeat timestamp
     cam = Camera.query.filter_by(id = camera_id).first()
     cam.status = CameraStatus.ONLINE
-    cam.last_heartbeat = datetime.now()
+    cam.last_heartbeat = datetime.now() # Renew heartbeat timestamp
     cam.update()
     
     user = Users.query.filter_by(id = cam.user_id).first()
@@ -85,7 +81,7 @@ def heartbeat(camera_id):
     return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': None})
 
 
-#Update the users primary camera
+# Update the users primary camera
 @bp.route("/make_primary/<int:camera_id>")
 @login_required
 def make_primary(camera_id):
@@ -144,7 +140,7 @@ def fault_analysis(camera_id):
         print(e)
         abort(422)
 
-#Generating funtion for video stream, produces frames from the PI one by one 
+# Generating funtion for video stream, produces frames from the Pi
 def generate_frame(camera_stream, primary_camera):
     
     cam_id, frame = camera_stream.get_frame()
@@ -152,7 +148,7 @@ def generate_frame(camera_stream, primary_camera):
     return (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-#Video stream, should be the soucre of the homepage video image
+# Video stream, should be the source of the home page video image
 @bp.route('/video_feed/<int:primary_camera>')
 def video_feed(primary_camera):
     global camera_stream
@@ -189,8 +185,7 @@ def enum_to_string(obj):
     if isinstance(obj, Enum):
         return obj.value
 
-    # For all other types, let Jinja use default behavior
-    return obj
+    return obj # For all other types, let Jinja use default behavior
 
 def timestamp_to_string(obj):
     return obj.strftime("%d-%b-%Y %I:%M %p")
