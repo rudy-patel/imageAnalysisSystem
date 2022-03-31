@@ -170,8 +170,8 @@ def test():
 #Generating funtion for video stream, produces frames from the PI one by one 
 def generate_frame(camera_stream, primary_camera):
     print("Generating frame")
-    cam_id, frame = camera_stream.get_frame()
-    print("got frame")
+    frame = camera_stream.get_frame()
+    
     if cam_id == primary_camera:
         frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
     else:
