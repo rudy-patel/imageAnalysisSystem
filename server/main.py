@@ -169,11 +169,9 @@ def test():
 
 #Generating funtion for video stream, produces frames from the PI one by one 
 def generate_frame(camera_stream, primary_camera):
-    print("Generating frame")
     #Frame is either None or a tuple {cam_id, frame (cv2img)}
     frame = camera_stream.get_frame()
     if not frame or (not frame[0] == primary_camera):
-        print("Send black image")
         file_name = path.join(path.dirname(__file__), 'black_img.jpeg')
         black_img = cv2.imread(file_name)
         frame = cv2.imencode('.jpg', black_img)[1].tobytes()
@@ -189,7 +187,6 @@ def generate_frame(camera_stream, primary_camera):
 @bp.route('/video_feed/<int:primary_camera>')
 def video_feed(primary_camera):
     global camera_stream
-    print(threading.active_count())
     
     if not camera_stream:
         camera_stream = server_camera.Camera()
