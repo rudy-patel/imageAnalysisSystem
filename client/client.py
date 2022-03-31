@@ -79,8 +79,7 @@ class Client():
             for (x, y, r) in circles:
                 cv2.circle(frame, (x, y), r, (0, 255, 0), 4) # draw the circle in the output image
                 cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1) # draw the rectangle in the output image
-                circle_detect_event(self, frame)
-                print("Circle detected")
+                self.circle_detect_event(frame)
         
         return frame
         
