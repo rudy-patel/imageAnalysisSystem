@@ -170,15 +170,16 @@ def test():
 #Generating funtion for video stream, produces frames from the PI one by one 
 def generate_frame(camera_stream, primary_camera):
     print("Generating frame")
+    #Frame is either None or a tuple {cam_id, frame (cv2img)}
     frame = camera_stream.get_frame()
-    
-    if cam_id == primary_camera:
-        frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
-    else:
+    if not frame or (not frame[0] == primary_camera):
         print("Send black image")
         file_name = path.join(path.dirname(__file__), 'black_img.jpeg')
         black_img = cv2.imread(file_name)
         frame = cv2.imencode('.jpg', black_img)[1].tobytes()
+    else:
+        frame = cv2.imencode('.jpg', frame[1])[1].tobytes() 
+
     return (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 

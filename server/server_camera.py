@@ -58,7 +58,7 @@ class Camera():
         if Camera.thread:
             return          
 
-        Camera.event = CameraEvent()
+        #Camera.event = CameraEvent()
         Camera.last_access = time.time()
 
         # start frame collection thread
@@ -102,7 +102,7 @@ class Camera():
             new_frame = cls.collect_frame(image_hub)
             try:
                 Camera.frame = new_frame
-                Camera.event.set()
+                #Camera.event.set()
 
             except Exception as e:
                 image_hub.zmq_socket.close()
