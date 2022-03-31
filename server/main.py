@@ -176,7 +176,7 @@ def shape_analysis(camera_id):
     event_type = request.form.get("event_type")
     timestamp = request.form.get("timestamp")
 
-    analyzed_image = request.files["analyzed_image"]
+    analyzed_image = request.files["image"]
     analyzed_image.filename = "{}/{}/ring_shape_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
     image_link = send_to_s3(analyzed_image, "lfiasimagestore")
 
