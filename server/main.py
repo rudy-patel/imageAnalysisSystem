@@ -7,7 +7,7 @@ from flask import Flask, Blueprint, redirect, url_for, render_template, request,
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from server.Forms import LoginForm, SignUpForm, TrainingForm
-from os import environ
+from os import environ, path
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import boto3
@@ -16,10 +16,12 @@ from server import server_camera
 from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
 import numpy as np
+import threading
 import urllib.request
 import face_recognition
 import pickle
 import hashlib
+
 
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
@@ -190,16 +192,16 @@ def face_detected(camera_id):
         print(e)
         abort(422)
 
-# This is for posting a new ring fault analysis event
-@bp.route("/v1/<int:camera_id>/ring-fault-analysis-event", methods=["POST"])
-def fault_analysis(camera_id):
+# This is for posting a new ring shape analysis event
+@bp.route("/v1/<int:camera_id>/ring-shape-analysis-event", methods=["POST"])
+def shape_analysis(camera_id):
     user_id = request.form.get("user_id")
     name = request.form.get("name")
     event_type = request.form.get("event_type")
     timestamp = request.form.get("timestamp")
 
-    analyzed_image = request.files["analyzed_image"]
-    analyzed_image.filename = "{}/{}/ring_fault_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
+    analyzed_image = request.files["image"]
+    analyzed_image.filename = "{}/{}/ring_shape_images/{}/{}".format(user_id, camera_id, name, analyzed_image.filename)
     image_link = send_to_s3(analyzed_image, "lfiasimagestore")
 
     try:
@@ -215,8 +217,15 @@ def fault_analysis(camera_id):
 
 # Generating funtion for video stream, produces frames from the Pi
 def generate_frame(camera_stream, primary_camera):
-    cam_id, frame = camera_stream.get_frame()
-    frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
+    #Frame is either None or a tuple {cam_id, frame (cv2img)}
+    frame = camera_stream.get_frame()
+    if not frame or (not frame[0] == primary_camera):
+        file_name = path.join(path.dirname(__file__), 'black_img.jpeg')
+        black_img = cv2.imread(file_name)
+        frame = cv2.imencode('.jpg', black_img)[1].tobytes()
+    else:
+        frame = cv2.imencode('.jpg', frame[1])[1].tobytes() 
+
     return (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
@@ -276,8 +285,8 @@ def home():
     if request.method == 'POST':
         if request.form['submit_button'] == 'Facial Recognition':
             camera.mode = CameraMode.FACIAL_RECOGNITION
-        elif request.form['submit_button'] == 'Fault Detection':
-            camera.mode = CameraMode.FAULT_DETECTION
+        elif request.form['submit_button'] == 'Shape Detection':
+            camera.mode = CameraMode.SHAPE_DETECTION
         else:
             pass # unknown
         

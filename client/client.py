@@ -19,7 +19,7 @@ class Client():
     def __init__(self, ip, port):
         self.port = port
         self.ip = ip
-        self.mode = "FAULT_DETECT"
+        self.mode = "SHAPE_DETECT"
         self.sender = imagezmq.ImageSender(connect_to="tcp://{}:{}".format(ip, "5555"))
         self.camera_id = 1
         self.name = socket.gethostname()
@@ -108,12 +108,43 @@ class Client():
             for (x, y, r) in circles:
                 cv2.circle(frame, (x, y), r, (0, 255, 0), 4) # draw the circle in the output image
                 cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1) # draw the rectangle in the output image
-                
-                print("Circle detected")
+                self.circle_detect_event(frame)
         
         return frame
         
-            
+    
+    def circle_detect_event(self, frame):
+        stamp = int(time.time())
+        if stamp - self.timeouts["circle"] < self.timeout_duration: # Check for timeout
+            return
+
+        # Convert to jpg and save temp file
+        # 10 digit random string with very low collision probability
+        rand_string = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(10))
+        filename = "circle_" + rand_string + ".jpg"
+        cv2.imwrite(filename, frame)
+
+        data = {
+            "user_id": 4,
+            "name": "circle",
+            "event_type": "SHAPE_DETECT_SUCCESS",
+            "timestamp": datetime.now(), 
+            }
+
+        file = {
+            "image": (filename, open(filename, "rb"), 'image/jpg')
+        }
+
+        print("Sending request, circle detection")
+        requests.post("http://" + self.ip + ":" + self.port + "/v1/" + str(self.camera_id) + "/ring-shape-analysis-event", files=file, data=data)
+        
+        # Delete temp file
+        path = os.path.join(self.location, filename)
+        os.remove(path)
+        
+        self.timeouts["circle"] = stamp # update timeout
+
+
 
     # Send a POST request to the server event route
     def facial_req_event(self, name, frame):
