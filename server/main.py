@@ -80,7 +80,6 @@ def heartbeat(camera_id):
     
     return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': None})
 
-
 # Update the users primary camera
 @bp.route("/make_primary/<int:camera_id>")
 @login_required
@@ -90,8 +89,6 @@ def make_primary(camera_id):
     user.update()
     
     return redirect(url_for('myapp.cameras'))
-
-
 
 # This is for posting a new facial recognition
 @bp.route("/v1/<int:camera_id>/facial-detection-event", methods=["POST"])
