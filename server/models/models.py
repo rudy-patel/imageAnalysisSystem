@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 import sys
-sys.path.append("..\server")
 from server.enums.cameraEnums import CameraMode, CameraStatus
 from server.enums.eventEnums import EventType
+
+sys.path.append("..\server")
 
 db = SQLAlchemy()
 
@@ -18,6 +19,12 @@ class Users(db.Model, UserMixin):
 
     def create(self):
         db.session.add(self)
+        db.session.commit()
+    
+    def get_id(self):
+        return self.id
+    
+    def update(self):
         db.session.commit()
 
 class Event(db.Model):

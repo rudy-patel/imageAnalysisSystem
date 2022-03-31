@@ -9,11 +9,13 @@
             <div class="row">
                 <!-- 16:9 aspect ratio -->
                 <div class="stream_container">
-                    <img src="{{ url_for('myapp.video_feed') }}" class="stream" id = "camera_stream">
+                    <img src="{{ url_for('myapp.video_feed', primary_camera=camera.id) }}" class="stream" id = "camera_stream">
                 </div>
                 <!-- Script performs a cache break on the camera stream element every 50ms-->
                 <script>let handle = setInterval( () => {
-                                        document.getElementById("camera_stream").src = "/video_feed#" + Date.now()
+                                        var feed = "/video_feed/"
+                                        var cam = '{{ camera.id }}'
+                                        document.getElementById("camera_stream").src = feed.concat(cam, "#", Date.now())
                                         }, 100)</script>
             </div>
             <div class="row justify-content-center">
@@ -31,10 +33,18 @@
                 <h4>Recent Events</h4>
             </div>
             <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {% for event in events %}
                     <tr>
                       <td>{{event.type | enum_to_string}}</td>
+                      <td>{{event.name}}</td>
                       <td>
                         <a role="button" class="btn btn-primary" href="{{ url_for('myapp.event_view' , event_id=event.id) }}">View Event</a>
                       </td>
