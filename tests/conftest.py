@@ -39,6 +39,7 @@ def captured_templates(app):
         recorded.append((template, context))
 
     template_rendered.connect(record, app)
+    
     try:
         yield recorded
     finally:

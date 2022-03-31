@@ -1,6 +1,5 @@
 from flask import json
 from server.models.models import Users, Camera
-import datetime
 
 def test_heartbeat(test_client):
     cameraID = 2

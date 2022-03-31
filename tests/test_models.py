@@ -17,8 +17,8 @@ def test_user():
     assert user.primary_camera == primary_camera
 
 def test_event():
-    user_id = 1
-    camera_id = 1
+    user_id = 5
+    camera_id = 6
     name = "test event"
     image_link = "test.com"
     type = EventType.FACIAL_MATCH_SUCCESS
@@ -40,7 +40,7 @@ def test_event():
 
 def test_camera():
     name = "test camera"
-    user_id = 1
+    user_id = 5
     status = CameraStatus.ONLINE
     mode = CameraMode.FACIAL_RECOGNITION
     last_heartbeat = datetime.date(2021, 4, 4)
