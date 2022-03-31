@@ -20,6 +20,7 @@ def test_client():
     flask_app = create_app()
     flask_app.config.update({
         'TESTING': True,
+        'WTF_CSRF_ENABLED': False,
     })
  
     testing_client = flask_app.test_client()

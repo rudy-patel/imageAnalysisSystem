@@ -119,7 +119,6 @@ def face_detected(camera_id):
 # This is for posting a new ring fault analysis event
 @bp.route("/v1/<int:camera_id>/ring-fault-analysis-event", methods=["POST"])
 def fault_analysis(camera_id):
-
     user_id = request.form.get("user_id")
     name = request.form.get("name")
     event_type = request.form.get("event_type")
@@ -142,7 +141,6 @@ def fault_analysis(camera_id):
 
 # Generating funtion for video stream, produces frames from the Pi
 def generate_frame(camera_stream, primary_camera):
-    
     cam_id, frame = camera_stream.get_frame()
     frame = cv2.imencode('.jpg', frame)[1].tobytes()  # Remove this line for test camera
     return (b'--frame\r\n'
