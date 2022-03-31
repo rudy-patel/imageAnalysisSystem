@@ -19,6 +19,7 @@ import numpy as np
 import urllib.request
 import face_recognition
 import pickle
+import hashlib
 
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
@@ -131,8 +132,19 @@ def heartbeat(camera_id):
     else:
         is_primary = False
   
-    if()
-    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': True})
+    #get hash of encoding
+    BUF_SIZE = 65536
+    sha1 = hashlib.sha1()
+    with open("encodings.pickle", 'rb') as f:
+        while True:
+            data = f.read(BUF_SIZE)
+            if not data:
+                break
+            sha1.update()
+  
+    
+
+    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings_hash': sha1.hexdigest()})
 
 
 # Send the requested encodings file
