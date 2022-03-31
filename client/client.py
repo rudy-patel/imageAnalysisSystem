@@ -40,7 +40,7 @@ class Client():
                 data = f.read(BUF_SIZE)
                 if not data:
                     break
-                sha1.update()
+                sha1.update(data)
         self.encoding_hash = sha1.hexdigest()
         time.sleep(2.0) # Camera warmup sleep
 
@@ -70,7 +70,8 @@ class Client():
                 if not self.encoding_hash == new_data['encodings_hash']:
                     self.encoding_hash = new_data['encodings_hash']
                     self.get_new_encodings()
-                
+                else:
+                    print("Encodings hashes match")
                 print("Heartbeat response:")
                 print(new_data)
             except:

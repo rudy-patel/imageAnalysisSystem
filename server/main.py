@@ -140,7 +140,7 @@ def heartbeat(camera_id):
             data = f.read(BUF_SIZE)
             if not data:
                 break
-            sha1.update()
+            sha1.update(data)
   
     
 
