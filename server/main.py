@@ -18,6 +18,8 @@ from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
 import numpy as np
 import urllib.request
+import face_recognition
+import pickle
 
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
@@ -71,11 +73,38 @@ def update_camera_status():
 def generate_face_encodings():
     s3 = boto3.resource('s3')    
     bucket_name = 'lfiasimagestore'
+
+    # initialize the list of known encodings and known names
+    knownEncodings = []
+    knownNames = []
     
     for item in s3.Bucket(bucket_name).objects.filter(Prefix="{}/face_training/".format(current_user.id)):
-        image = url_to_image("https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, item.key))
-        
+        current_name = item.key.split('/')[2]
 
+        image = url_to_image("https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, item.key))
+
+        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        # detect the (x, y)-coordinates of the bounding boxes
+        # corresponding to each face in the input image
+        boxes = face_recognition.face_locations(rgb_image, model="hog")
+        
+        # compute the facial embedding for the face
+        encodings = face_recognition.face_encodings(rgb_image, boxes)
+        
+        # loop over the encodings
+        for encoding in encodings:
+            # add each encoding + name to our set of known names and encodings
+            knownEncodings.append(encoding)
+            knownNames.append(current_name)
+    
+    # dump the facial encodings + names to disk
+    data = {"encodings": knownEncodings, "names": knownNames}
+    f = open("encodings.pickle", "wb")
+    f.write(pickle.dumps(data))
+    f.close()      
+
+# Get an image from a url and manipulate it in RAM instead of downloading and playing around in disk
 def url_to_image(url):
     # Download the image into local memory instead of disk
     resp = urllib.request.urlopen(url).read()
@@ -306,7 +335,8 @@ def train():
 
                 filepath = send_to_s3(form.file.data, "lfiasimagestore")
                 flash("Saved image successfully at: {}".format(str(filepath)))
-                # TODO: spin off a thread to handle this function
+
+                # TODO: possibly spin off a thread to handle this function?
                 generate_face_encodings()
                 return redirect(url_for('myapp.train'))
         else:
