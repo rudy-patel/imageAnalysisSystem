@@ -25,7 +25,7 @@ migrate = Migrate()
 
 loginManager = LoginManager()
 
-camera_stream = None  
+camera_stream = None
 
 def create_app():
     app = Flask(__name__)
@@ -130,8 +130,20 @@ def heartbeat(camera_id):
         is_primary = True
     else:
         is_primary = False
-    
-    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': None})
+  
+    if()
+    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': True})
+
+
+# Send the requested encodings file
+@bp.route("/v1/encodings", methods=["GET"])
+def get_encodings():
+    return Response(
+        open('encodings.pickle', 'rb'),
+        mimetype='application/python-pickle',
+        headers={"Content-Type": "attachment;filename=encodings.pickle"})
+
+
 
 # Update the users primary camera
 @bp.route("/make_primary/<int:camera_id>")
