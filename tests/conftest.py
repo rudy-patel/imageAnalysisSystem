@@ -1,9 +1,6 @@
-import flask
 import pytest
 from flask import template_rendered
 from server.main import create_app
-
-
 
 @pytest.fixture()
 def app():
@@ -12,11 +9,7 @@ def app():
         "TESTING": True,
     })
 
-    # other setup can go here
-
     yield app
-
-    # clean up / reset resources here
 
 @pytest.fixture()
 def client(app):
@@ -24,21 +17,18 @@ def client(app):
 
 @pytest.fixture()
 def test_client():
-    # return TestApp(app)
     flask_app = create_app()
     flask_app.config.update({
         'TESTING': True,
+        'WTF_CSRF_ENABLED': False,
     })
  
-    # Flask provides a way to test your application by exposing the Werkzeug test Client
-    # and handling the context locals for you.
     testing_client = flask_app.test_client()
  
-    # Establish an application context before running the tests.
     ctx = flask_app.app_context()
     ctx.push()
- 
-    yield testing_client  # this is where the testing happens!
+    
+    yield testing_client
  
     ctx.pop()
 
@@ -50,6 +40,7 @@ def captured_templates(app):
         recorded.append((template, context))
 
     template_rendered.connect(record, app)
+    
     try:
         yield recorded
     finally:

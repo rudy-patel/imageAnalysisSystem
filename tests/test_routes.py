@@ -1,35 +1,61 @@
-from flask import json, jsonify
-import datetime
+from flask import json
+from server.models.models import Users, Camera
 
-
-def test_test_post(client):
-    response = client.post("/test")
-    data = json.loads(response.get_data(as_text=True))
-    assert data['data'] == 'post_request'
-
-def test_test_get(client):
-    response = client.get("/test")
-    data = json.loads(response.get_data(as_text=True))
-    assert data['data'] == 'get_request'
-
-def test_event(test_client):
-    """Test the endpoint for posting events"""
-    input_data = { 
-        "user_id": 5,
-        "camera_id": 2,
-        "event_type": "IMAGE_CAPTURE_FAILED",
-        "timestamp": datetime.date(2022, 1, 1)
-    }
-    response = test_client.post("/v1/events", data=input_data)
-    response_data = json.loads(response.get_data(as_text=True))
-    assert response_data['success'] == True
-
-def test_heartbeat(client):
+def test_heartbeat(test_client):
     cameraID = 2
-    response = client.get("/v1/heartbeat/" + str(cameraID))
+    response = test_client.get("/v1/heartbeat/" + str(cameraID))
     response_data = json.loads(response.get_data(as_text=True))
+
+    cam = Camera.query.filter_by(id = cameraID).first()
+    user_primary_cam = Users.query.filter_by(id=cam.user_id).first().primary_camera
     
-    assert response_data['camera_id'] == cameraID
-    assert response_data['mode'] == "FACIAL_RECOGNITION"
-    assert response_data['is_primary'] == False
+    assert response_data['camera_id'] == cam.id
+    assert response_data['mode'] == cam.mode.value
+    assert response_data['is_primary'] == (user_primary_cam == cameraID)
     assert response_data['encodings'] == None
+
+def test_logout(test_client):
+    response = test_client.get('/logout', follow_redirects=True)
+    
+    # Check that there was one redirect response.
+    assert len(response.history) == 1
+    
+    # Check that the second request was to the login page.
+    assert response.request.path == "/login"
+
+def test_valid_login(test_client):
+    response = test_client.post('/login', data=dict(
+            email="apitest@gmail.com",
+            password="123456"
+        ), follow_redirects=True)
+
+    # Check that there was one redirect response.
+    assert len(response.history) == 1
+    
+    # Check that the second request was to the home page.
+    assert response.request.path == "/"
+
+def test_invalid_password_login(test_client):
+    response = test_client.post('/login', data=dict(
+            email="apitest@gmail.com",
+            password="654321"
+        ), follow_redirects=True)
+
+    assert b'Invalid email/password' in response.data
+
+def test_invalid_email_login(test_client):
+    response = test_client.post('/login', data=dict(
+            email="asdf@gmail.com",
+            password="123456"
+        ), follow_redirects=True)
+
+    assert b'Invalid email/password' in response.data
+
+def test_invalid_signup(test_client):
+    response = test_client.post('/signup', data=dict(
+            name="test",
+            email="apitest@gmail.com",
+            password="123456"
+        ), follow_redirects=True)
+
+    assert b'A user already exists with that email!' in response.data
