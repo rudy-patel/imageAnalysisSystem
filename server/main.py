@@ -17,6 +17,7 @@ from importlib import import_module
 from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
 import numpy as np
+import threading
 
 
 bp = Blueprint('myapp', __name__)
@@ -181,7 +182,8 @@ def generate_frame(camera_stream, primary_camera):
 @bp.route('/video_feed/<int:primary_camera>')
 def video_feed(primary_camera):
     global camera_stream
-    
+    print(threading.active_count())
+
     if not camera_stream:
         camera_stream = server_camera.Camera()
     resp = Response(generate_frame(camera_stream, primary_camera),
