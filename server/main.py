@@ -336,7 +336,6 @@ def train():
                 filepath = send_to_s3(form.file.data, "lfiasimagestore")
                 flash("Saved image successfully at: {}".format(str(filepath)))
 
-                # TODO: possibly spin off a thread to handle this function?
                 generate_face_encodings()
                 return redirect(url_for('myapp.train'))
         else:
