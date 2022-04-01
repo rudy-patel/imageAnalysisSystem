@@ -132,8 +132,7 @@ def calc_hash():
             sha1.update(data)
     return sha1.hexdigest()
   
-
-@bp.route("/v1/heartbeat/<int:camera_id>", methods=["GET"])
+@bp.route("/heartbeat/<int:camera_id>", methods=["GET"])
 def heartbeat(camera_id):
     cam = Camera.query.filter_by(id = camera_id).first()
     cam.status = CameraStatus.ONLINE
@@ -170,7 +169,7 @@ def make_primary(camera_id):
     return redirect(url_for('myapp.cameras'))
 
 # This is for posting a new facial recognition
-@bp.route("/v1/<int:camera_id>/facial-detection-event", methods=["POST"])
+@bp.route("/<int:camera_id>/facial-detection-event", methods=["POST"])
 def face_detected(camera_id):
     user_id = request.form.get("user_id")
     name = request.form.get("name")
@@ -193,7 +192,7 @@ def face_detected(camera_id):
         abort(422)
 
 # This is for posting a new ring shape analysis event
-@bp.route("/v1/<int:camera_id>/ring-shape-analysis-event", methods=["POST"])
+@bp.route("/<int:camera_id>/ring-shape-analysis-event", methods=["POST"])
 def shape_analysis(camera_id):
     user_id = request.form.get("user_id")
     name = request.form.get("name")
