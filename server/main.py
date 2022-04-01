@@ -20,6 +20,7 @@ import threading
 import urllib.request
 import face_recognition
 import pickle
+import hashlib
 
 
 bp = Blueprint('myapp', __name__)
@@ -27,7 +28,7 @@ migrate = Migrate()
 
 loginManager = LoginManager()
 
-camera_stream = None  
+camera_stream = None
 
 def create_app():
     app = Flask(__name__)
@@ -119,7 +120,19 @@ def url_to_image(url):
 
     return image
 
+
+def calc_hash():
+    BUF_SIZE = 65536
+    sha1 = hashlib.sha1()
+    with open("encodings.pickle", 'rb') as f:
+        while True:
+            data = f.read(BUF_SIZE)
+            if not data:
+                break
+            sha1.update(data)
+    return sha1.hexdigest()
   
+
 @bp.route("/v1/heartbeat/<int:camera_id>", methods=["GET"])
 def heartbeat(camera_id):
     cam = Camera.query.filter_by(id = camera_id).first()
@@ -132,8 +145,19 @@ def heartbeat(camera_id):
         is_primary = True
     else:
         is_primary = False
-    
-    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings': None})
+
+    return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings_hash': calc_hash()})
+
+
+# Send the requested encodings file
+@bp.route("/v1/encodings", methods=["GET"])
+def get_encodings():
+    return Response(
+        open('encodings.pickle', 'rb'),
+        mimetype='application/python-pickle',
+        headers={"Content-Type": "attachment;filename=encodings.pickle"})
+
+
 
 # Update the users primary camera
 @bp.route("/make_primary/<int:camera_id>")
