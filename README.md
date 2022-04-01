@@ -39,6 +39,12 @@ You're all set! The server should now be running on `127.0.0.1:5000`.
 ### Running the client
 To run the client:
 
+### Resources used
+* [Login using Flask-Login and SQLAlchemy](https://www.youtube.com/watch?v=8aTnmsDMldY)
+* [Data tables with bootstrap4](https://www.youtube.com/watch?v=yGBk9Nalyq8)
+* [Data models in Flask](https://flask-sqlalchemy.palletsprojects.com/en/2.x/models/)
+* [Adding flask-migrate to existing project](https://blog.miguelgrinberg.com/post/how-to-add-flask-migrate-to-an-existing-project)
+* [Flask Multi-Camera Streaming](https://gitee.com/huzhuhua/Flask-Multi-Camera-Streaming-With-YOLOv4-and-Deep-SORT/tree/master)
 ### Contributors
 | Name | Email  |
 |---|---|

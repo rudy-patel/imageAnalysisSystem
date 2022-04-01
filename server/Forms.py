@@ -36,15 +36,17 @@ class TrainingForm(FlaskForm):
                                  ('Jacob', 'Jacob')
                                ])
     
-    newPersonName = StringField('Add a new person',
+    newPersonName = StringField('Add a person',
                         validators=[Length(max=30)],
-                        render_kw={"placeholder": "New person name"})
+                        #render_kw={"placeholder": "New person name"})
+                        render_kw={"placeholder": "Person name"})
 
     def validate(self, extra_validators=None):
         if super().validate(extra_validators):
 
             if not ((self.personSelect.data and not self.newPersonName.data) or (not self.personSelect.data and self.newPersonName.data)):
-                self.newPersonName.errors.append('You must choose an existing person OR provide a new name, not both!')
+                #self.newPersonName.errors.append('You must choose an existing person OR provide a new name, not both!')
+                self.newPersonName.errors.append('You must provide a name!')
                 return False
             else:
                 return True
