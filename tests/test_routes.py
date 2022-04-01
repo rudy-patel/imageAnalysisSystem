@@ -1,5 +1,6 @@
 from flask import json
 from server.models.models import Users, Camera
+from server.main import calc_hash
 
 def test_heartbeat(test_client):
     cameraID = 2
@@ -12,7 +13,7 @@ def test_heartbeat(test_client):
     assert response_data['camera_id'] == cam.id
     assert response_data['mode'] == cam.mode.value
     assert response_data['is_primary'] == (user_primary_cam == cameraID)
-    assert response_data['encodings'] == None
+    assert response_data['encodings_hash'] == calc_hash()
 
 def test_logout(test_client):
     response = test_client.get('/logout', follow_redirects=True)
