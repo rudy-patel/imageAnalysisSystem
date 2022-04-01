@@ -36,7 +36,6 @@ class Client():
         self.encoding_hash = Client.calc_hash()
         time.sleep(2.0) # Camera warmup sleep
 
-
     def run(self):
         while True:
             self.heartbeat() # send heartbeat
@@ -47,7 +46,6 @@ class Client():
                 frame = self.circle_detect(frame)
             if self.is_primary:
                 self.sender.send_image(self.camera_id, frame)
-
 
     def heartbeat(self):
         now = int(time.time())
@@ -67,16 +65,17 @@ class Client():
                 return
 
 
+
     def get_new_encodings(self):
             try:
                 encodings = requests.get("http://" + self.ip + ":" + self.port + "/v1/encodings")
-                with open('encodings.pickle', 'wb+') as pickle_file:
-                    pickle_file.write(encodings.content)
-                    self.encoding_data = pickle.loads(pickle_file.read())
-                    self.encoding_hash = Client.calc_hash()
-                    print("Updated encodings file")
+                open('encodings.pickle', 'wb').write(encodings.content)
+                self.encoding_data = pickle.loads(open("encodings.pickle", "rb").read())
+                #Update hash
+                self.encoding_hash = Client.calc_hash()
+                print("Updated encodings file")
             except Exception as e:
-                print("Failed to load new encodings file")
+                print("Failed to load new encodings data")
                 print(e)
             
             
@@ -90,6 +89,7 @@ class Client():
                     break
                 sha1.update(data)
         return sha1.hexdigest()
+
 
     
     # circle_detect algorithm from: https://pyimagesearch.com/2014/07/21/detecting-circles-images-using-opencv-hough-circles/
@@ -109,6 +109,7 @@ class Client():
                 cv2.circle(frame, (x, y), r, (0, 255, 0), 4) # draw the circle in the output image
                 cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1) # draw the rectangle in the output image
                 self.circle_detect_event(frame)
+        
         return frame
         
     
