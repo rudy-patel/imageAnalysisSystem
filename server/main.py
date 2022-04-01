@@ -43,7 +43,15 @@ def timestamp_to_string(obj):
 def camera_name_from_id(id):
     camera = Camera.query.filter_by(id=id).first()
     return camera.name
-    
+
+def update_camera_status():
+    with app.app_context():
+        online_cameras = Camera.query.filter_by(status = CameraStatus.ONLINE).all()
+        for cam in online_cameras:
+            if  datetime.now().timestamp() - cam.last_heartbeat.timestamp() > 60:
+                cam.status = CameraStatus.OFFLINE
+                cam.update()
+
 def create_app():
     app = Flask(__name__)
 
@@ -80,13 +88,7 @@ app = create_app()
 def loadUser(id):
     return Users.query.get(int(id))
 
-def update_camera_status():
-    with app.app_context():
-        online_cameras = Camera.query.filter_by(status = CameraStatus.ONLINE).all()
-        for cam in online_cameras:
-            if  datetime.now().timestamp() - cam.last_heartbeat.timestamp() > 60:
-                cam.status = CameraStatus.OFFLINE
-                cam.update()
+
 
 # Generate face encodings using all images in the current user's face_training name-labelled
 # S3 bucket 'folders'
