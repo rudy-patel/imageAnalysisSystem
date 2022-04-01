@@ -49,7 +49,11 @@
   var table = $('.events-table').DataTable({
     searching: true, // enable search input
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]], // custom number of entries
-    order: [[3, 'desc']]
+    'columnDefs': [ {
+      'targets': [3], /* column index */
+      'orderable': false, /* true or false */
+    }],
+    order: []
   });
 
   $('.events-table tfoot th').each( function () {
