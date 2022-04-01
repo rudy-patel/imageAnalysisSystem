@@ -53,7 +53,7 @@ class Client():
             self.last_heartbeat = now
             # Send another heartbeat
             try:
-                new_data = requests.get("http://" + self.ip + ":" + self.port + "/v1/heartbeat/" + str(self.camera_id)).json()
+                new_data = requests.get("http://" + self.ip + ":" + self.port + "/heartbeat/" + str(self.camera_id)).json()
                 
                 self.mode = new_data['mode']
                 self.is_primary = new_data['is_primary']
@@ -107,7 +107,7 @@ class Client():
         }
 
         print("Sending request, circle detection")
-        requests.post("http://" + self.ip + ":" + self.port + "/v1/" + str(self.camera_id) + "/ring-shape-analysis-event", files=file, data=data)
+        requests.post("http://" + self.ip + ":" + self.port + "/" + str(self.camera_id) + "/ring-shape-analysis-event", files=file, data=data)
         
         # Delete temp file
         path = os.path.join(self.location, filename)
@@ -141,7 +141,7 @@ class Client():
         }
 
         print("Sending request, Name: " + name)
-        requests.post("http://" + self.ip + ":" + self.port + "/v1/" + str(self.camera_id) + "/facial-detection-event", files=file, data=data)
+        requests.post("http://" + self.ip + ":" + self.port + "/" + str(self.camera_id) + "/facial-detection-event", files=file, data=data)
         
         # Delete temp file
         path = os.path.join(self.location, filename)

@@ -3,7 +3,7 @@ from server.models.models import Users, Camera
 
 def test_heartbeat(test_client):
     cameraID = 2
-    response = test_client.get("/v1/heartbeat/" + str(cameraID))
+    response = test_client.get("/heartbeat/" + str(cameraID))
     response_data = json.loads(response.get_data(as_text=True))
 
     cam = Camera.query.filter_by(id = cameraID).first()

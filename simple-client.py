@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 
-hardcoded_url = "http://127.0.0.1:5000/v1/1/facial-detection-event"
+hardcoded_url = "http://127.0.0.1:5000/1/facial-detection-event"
 
 a = datetime.now()
 testid = 2
