@@ -13,6 +13,7 @@ import os
 from datetime import datetime
 from collections import defaultdict
 import numpy as np
+from socket import gethostbyname
 
 class Client():
     def __init__(self, ip, port):
@@ -218,7 +219,7 @@ class Client():
 
 
 def main():
-    client = Client("127.0.0.1", "5000")
+    client = Client(gethostbyname("image-analysis-system.vercel.app"), "5000")
     client.run()
 
 if __name__ == "__main__":
