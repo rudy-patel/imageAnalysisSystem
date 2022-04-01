@@ -219,7 +219,7 @@ class Client():
 
 
 def main():
-    client = Client(gethostbyname("image-analysis-system.vercel.app"), "5000")
+    client = Client(gethostbyname("image-analysis-system.vercel.app"), "4545")
     client.run()
 
 if __name__ == "__main__":
