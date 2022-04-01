@@ -13,6 +13,7 @@ import os
 from datetime import datetime
 from collections import defaultdict
 import numpy as np
+import hashlib
 
 class Client():
     def __init__(self, ip, port):
@@ -23,7 +24,7 @@ class Client():
         self.camera_id = 1
         self.name = socket.gethostname()
         self.vs = VideoStream(usePiCamera=True).start()
-        self.encode_data = pickle.loads(open("encodings.pickle", "rb").read())
+        self.encoding_data = pickle.loads(open("encodings.pickle", "rb").read())
         self.timeouts = defaultdict(int)
         self.timeout_duration = 60
         self.location = "/home/pi/imageAnalysisSystem/client"
@@ -31,19 +32,18 @@ class Client():
         self.last_heartbeat = 0
         self.circle_detection_timeout = 5
         self.is_primary = True
-        
+         #get hash of encoding
+        self.encoding_hash = Client.calc_hash()
         time.sleep(2.0) # Camera warmup sleep
 
     def run(self):
         while True:
             self.heartbeat() # send heartbeat
             frame = self.vs.read() # read frame
-            
             if self.mode == "FACIAL_RECOGNITION":
-                frame = self.facial_req(frame, self.encode_data)
+                frame = self.facial_req(frame, self.encoding_data)
             else:
                 frame = self.circle_detect(frame)
-            
             if self.is_primary:
                 self.sender.send_image(self.camera_id, frame)
 
@@ -57,11 +57,40 @@ class Client():
                 
                 self.mode = new_data['mode']
                 self.is_primary = new_data['is_primary']
-                
+                if not self.encoding_hash == new_data['encodings_hash']:
+                    self.get_new_encodings()
                 print("Heartbeat response:")
                 print(new_data)
             except:
                 return
+
+
+
+    def get_new_encodings(self):
+            try:
+                encodings = requests.get("http://" + self.ip + ":" + self.port + "/v1/encodings")
+                open('encodings.pickle', 'wb').write(encodings.content)
+                self.encoding_data = pickle.loads(open("encodings.pickle", "rb").read())
+                #Update hash
+                self.encoding_hash = Client.calc_hash()
+                print("Updated encodings file")
+            except Exception as e:
+                print("Failed to load new encodings data")
+                print(e)
+            
+            
+    def calc_hash():
+        BUF_SIZE = 65536
+        sha1 = hashlib.sha1()
+        with open("encodings.pickle", 'rb') as f:
+            while True:
+                data = f.read(BUF_SIZE)
+                if not data:
+                    break
+                sha1.update(data)
+        return sha1.hexdigest()
+
+
     
     # circle_detect algorithm from: https://pyimagesearch.com/2014/07/21/detecting-circles-images-using-opencv-hough-circles/
     def circle_detect(self, frame):
@@ -149,8 +178,6 @@ class Client():
         
         self.timeouts[name] = stamp # update timeout
 
-    def update_encodings(self):
-        self.data = pickle.loads(open("encodings.pickle", "rb").read())
 
     # Takes a frame and returns a cv2 facial req boxed frame
     def facial_req(self, frame, data):
