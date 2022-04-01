@@ -1,2 +1,2 @@
-from server.main import create_app
-app = create_app()
+# from server.main import create_app
+# app = create_app()

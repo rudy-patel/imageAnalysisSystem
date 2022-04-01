@@ -61,12 +61,14 @@ def create_app():
     except:
         scheduler.shutdown() # shutdown if app occurs except
 
+app = create_app()
+
 @loginManager.user_loader
 def loadUser(id):
     return Users.query.get(int(id))
 
 def update_camera_status():
-    with current_app.app_context():
+    with app.app_context():
         online_cameras = Camera.query.filter_by(status = CameraStatus.ONLINE).all()
         for cam in online_cameras:
             if  datetime.now().timestamp() - cam.last_heartbeat.timestamp() > 60:
