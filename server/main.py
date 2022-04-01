@@ -21,7 +21,7 @@ import urllib.request
 import face_recognition
 import pickle
 import hashlib
-from app import app
+from flask import current_app
 
 
 bp = Blueprint('myapp', __name__)
@@ -66,7 +66,7 @@ def loadUser(id):
     return Users.query.get(int(id))
 
 def update_camera_status():
-    with app.app_context():
+    with current_app.app_context():
         online_cameras = Camera.query.filter_by(status = CameraStatus.ONLINE).all()
         for cam in online_cameras:
             if  datetime.now().timestamp() - cam.last_heartbeat.timestamp() > 60:
