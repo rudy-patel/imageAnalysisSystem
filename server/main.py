@@ -21,6 +21,7 @@ import urllib.request
 import face_recognition
 import pickle
 import hashlib
+from app import app
 
 
 bp = Blueprint('myapp', __name__)
