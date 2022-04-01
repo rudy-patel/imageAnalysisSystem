@@ -33,27 +33,17 @@ class Client():
         self.circle_detection_timeout = 5
         self.is_primary = True
          #get hash of encoding
-        BUF_SIZE = 65536
-        sha1 = hashlib.sha1()
-        with open("encodings.pickle", 'rb') as f:
-            while True:
-                data = f.read(BUF_SIZE)
-                if not data:
-                    break
-                sha1.update(data)
-        self.encoding_hash = sha1.hexdigest()
+        self.encoding_hash = Client.calc_hash()
         time.sleep(2.0) # Camera warmup sleep
 
     def run(self):
         while True:
             self.heartbeat() # send heartbeat
             frame = self.vs.read() # read frame
-            
             if self.mode == "FACIAL_RECOGNITION":
-                frame = self.facial_req(frame, self.encode_data)
+                frame = self.facial_req(frame, self.encoding_data)
             else:
                 frame = self.circle_detect(frame)
-            
             if self.is_primary:
                 self.sender.send_image(self.camera_id, frame)
 
@@ -68,10 +58,7 @@ class Client():
                 self.mode = new_data['mode']
                 self.is_primary = new_data['is_primary']
                 if not self.encoding_hash == new_data['encodings_hash']:
-                    self.encoding_hash = new_data['encodings_hash']
                     self.get_new_encodings()
-                else:
-                    print("Encodings hashes match")
                 print("Heartbeat response:")
                 print(new_data)
             except:
@@ -81,14 +68,28 @@ class Client():
 
     def get_new_encodings(self):
             try:
-                encodings = requests.get("http://" + self.ip + ":" + self.port + "v1/encodings")
+                encodings = requests.get("http://" + self.ip + ":" + self.port + "/v1/encodings")
             except:
                 print("couldnt get pickle :(")
                 return
             os.remove("encodings.pickle")
             open('encodings.pickle', 'wb').write(encodings.content)
             self.encoding_data = pickle.loads(open("encodings.pickle", "rb").read())
-
+            #Update hash
+            self.encoding_hash = Client.calc_hash()
+            print("Updated encodings file")
+            
+            
+    def calc_hash():
+        BUF_SIZE = 65536
+        sha1 = hashlib.sha1()
+        with open("encodings.pickle", 'rb') as f:
+            while True:
+                data = f.read(BUF_SIZE)
+                if not data:
+                    break
+                sha1.update(data)
+        return sha1.hexdigest()
 
 
     
