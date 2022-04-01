@@ -31,6 +31,19 @@ loginManager = LoginManager()
 
 camera_stream = None
 
+def enum_to_string(obj):
+    if isinstance(obj, Enum):
+        return obj.value
+
+    return obj # For all other types, let Jinja use default behavior
+
+def timestamp_to_string(obj):
+    return obj.strftime("%d-%b-%Y %H:%M")
+
+def camera_name_from_id(id):
+    camera = Camera.query.filter_by(id=id).first()
+    return camera.name
+    
 def create_app():
     app = Flask(__name__)
 
@@ -265,18 +278,7 @@ def testAddCamera():
 
     return redirect(url_for('myapp.home'))
 
-def enum_to_string(obj):
-    if isinstance(obj, Enum):
-        return obj.value
 
-    return obj # For all other types, let Jinja use default behavior
-
-def timestamp_to_string(obj):
-    return obj.strftime("%d-%b-%Y %H:%M")
-
-def camera_name_from_id(id):
-    camera = Camera.query.filter_by(id=id).first()
-    return camera.name
 
 @bp.route("/home")
 @bp.route("/", methods=['GET', 'POST'])
