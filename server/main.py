@@ -83,7 +83,7 @@ def generate_face_encodings():
     knownNames = []
     
     for item in s3.Bucket(bucket_name).objects.filter(Prefix="{}/face_training/".format(current_user.id)):
-        current_name = item.key.split('/')[2].captitalize()
+        current_name = item.key.split('/')[2].capitalize()
 
         image = url_to_image("https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, item.key))
 
