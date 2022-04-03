@@ -83,7 +83,7 @@ def generate_face_encodings():
     knownNames = []
     
     for item in s3.Bucket(bucket_name).objects.filter(Prefix="{}/face_training/".format(current_user.id)):
-        current_name = item.key.split('/')[2]
+        current_name = item.key.split('/')[2].captitalize()
 
         image = url_to_image("https://{}.s3.us-west-2.amazonaws.com/{}".format(bucket_name, item.key))
 
@@ -368,7 +368,7 @@ def train():
                 if form.personSelect.data:
                     form.file.data.filename = "{}/face_training/{}/{}".format(current_user.id, form.personSelect.data[0], form.file.data.filename)
                 else:
-                    form.file.data.filename = "{}/face_training/{}/{}".format(current_user.id, form.newPersonName.data, form.file.data.filename)
+                    form.file.data.filename = "{}/face_training/{}/{}".format(current_user.id, form.newPersonName.data.lower().strip(), form.file.data.filename)
 
                 filepath = send_to_s3(form.file.data, "lfiasimagestore")
                 
