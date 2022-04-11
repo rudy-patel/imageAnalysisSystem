@@ -39,6 +39,16 @@ You're all set! The server should now be running on `127.0.0.1:5000`.
 ### Running the client
 To run the client:
 
+### Running tests
+To run tests, in your virtual environment run:
+```bash
+python -m pytest
+```
+
+### Project overview
+![overview](LFIAS_2022_04_04_FP_poster.png)
+
+
 ### Resources used
 * [Login using Flask-Login and SQLAlchemy](https://www.youtube.com/watch?v=8aTnmsDMldY)
 * [Data tables with bootstrap4](https://www.youtube.com/watch?v=yGBk9Nalyq8)
