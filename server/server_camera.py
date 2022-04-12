@@ -69,15 +69,12 @@ class Camera():
         # Camera.last_access = time.time()
         return Camera.frame
 
-
-
     @classmethod
     def collect_frame(cls, image_hub):
         cam_id, frame = image_hub.recv_image()
         image_hub.send_reply(b'OK')  # this is needed for the stream to work with REQ/REP pattern
 
         return cam_id, frame
-
 
     # Thread function, collects frames from the specified port
     def _thread(cls):
@@ -91,11 +88,9 @@ class Camera():
             
             try:
                 Camera.frame = new_frame
-
             except Exception as e:
                 image_hub.zmq_socket.close()
                 
                 print('Closing server socket at port {}.'.format(port))
                 print('Stopping server thread for device due to error.')
-                
                 print(e)

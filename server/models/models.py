@@ -8,6 +8,7 @@ sys.path.append("..\server")
 
 db = SQLAlchemy()
 
+# This model describes a user and maps to the users table
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
@@ -17,16 +18,19 @@ class Users(db.Model, UserMixin):
     events = db.relationship('Event', backref='users', lazy=True)
     cameras = db.relationship('Camera', backref='users', lazy=True)
 
+    # this function creates a new user in the database
     def create(self):
         db.session.add(self)
         db.session.commit()
-    
+
     def get_id(self):
         return self.id
     
+    # this function updates the current user in the database
     def update(self):
         db.session.commit()
 
+# This model describes an event and maps to the events table
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -36,10 +40,12 @@ class Event(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False)
     image_link = db.Column(db.String(200), nullable=True)
 
+    # this function creates a new event in the database
     def create(self):
         db.session.add(self)
         db.session.commit()
 
+# This model describes a camera and maps to the cameras table
 class Camera(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -48,9 +54,11 @@ class Camera(db.Model):
     mode = db.Column(db.Enum(CameraMode), nullable=False)
     last_heartbeat = db.Column(db.DateTime, nullable=True)
 
+    # this function creates a new camera in the database
     def create(self):
         db.session.add(self)
         db.session.commit()
-
+    
+    # this function updates the current event in the database
     def update(self):
         db.session.commit()

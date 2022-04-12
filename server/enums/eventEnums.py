@@ -1,5 +1,6 @@
 import enum
 
+# This enum holds the different event types for the system
 class EventType(enum.Enum):
     FACIAL_MATCH_SUCCESS = "Face recognized"
     FACIAL_MATCH_FAILED = "New face detected"

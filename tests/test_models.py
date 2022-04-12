@@ -3,6 +3,8 @@ from server.enums.cameraEnums import CameraMode, CameraStatus
 from server.enums.eventEnums import EventType
 import datetime
 
+# This file holds tests for the database models
+
 def test_user():
     name = "Test"
     email = 'test@gmail.com'

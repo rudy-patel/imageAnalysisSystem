@@ -22,12 +22,9 @@ import face_recognition
 import pickle
 import hashlib
 
-
 bp = Blueprint('myapp', __name__)
 migrate = Migrate()
-
 loginManager = LoginManager()
-
 camera_stream = None
 
 def create_app():
@@ -60,10 +57,12 @@ def create_app():
     except:
         scheduler.shutdown() # shutdown if app occurs except
 
+# This function loads the user from the current session
 @loginManager.user_loader
 def loadUser(id):
     return Users.query.get(int(id))
 
+# This is the background job that updates the camera status in the database
 def update_camera_status():
     with app.app_context():
         online_cameras = Camera.query.filter_by(status = CameraStatus.ONLINE).all()
@@ -108,7 +107,6 @@ def generate_face_encodings():
     f = open("encodings.pickle", "wb")
     f.write(pickle.dumps(data))
     f.close()      
-
     
 # Get an image from a url and manipulate it in RAM instead of downloading and playing around in disk
 def url_to_image(url):
@@ -120,7 +118,7 @@ def url_to_image(url):
 
     return image
 
-
+# This function calculates the encodings file hash to detect when it has been changed
 def calc_hash():
     BUF_SIZE = 65536
     sha1 = hashlib.sha1()
@@ -132,6 +130,7 @@ def calc_hash():
             sha1.update(data)
     return sha1.hexdigest()
   
+# The heartbeat function/route services the heartbeat from each camera
 @bp.route("/heartbeat/<int:camera_id>", methods=["GET"])
 def heartbeat(camera_id):
     cam = Camera.query.filter_by(id = camera_id).first()
@@ -147,8 +146,7 @@ def heartbeat(camera_id):
 
     return jsonify({'camera_id': camera_id, 'mode': cam.mode.value, 'is_primary': is_primary, 'encodings_hash': calc_hash()})
 
-
-# Send the requested encodings file
+# The get_encodings function/route sends the requested encodings file
 @bp.route("/v1/encodings", methods=["GET"])
 def get_encodings():
     return Response(
@@ -156,9 +154,7 @@ def get_encodings():
         mimetype='application/python-pickle',
         headers={"Content-Type": "attachment;filename=encodings.pickle"})
 
-
-
-# Update the users primary camera
+# The make_primary function/route updates the users primary camera
 @bp.route("/make_primary/<int:camera_id>")
 @login_required
 def make_primary(camera_id):
@@ -168,7 +164,7 @@ def make_primary(camera_id):
     
     return redirect(url_for('myapp.cameras'))
 
-# This is for posting a new facial recognition
+# The face_detected function/route gets a new face detect event
 @bp.route("/<int:camera_id>/facial-detection-event", methods=["POST"])
 def face_detected(camera_id):
     user_id = request.form.get("user_id")
@@ -191,7 +187,7 @@ def face_detected(camera_id):
         print(e)
         abort(422)
 
-# This is for posting a new ring shape analysis event
+# The shape_analysis function/route gets a new shape detected event
 @bp.route("/<int:camera_id>/ring-shape-analysis-event", methods=["POST"])
 def shape_analysis(camera_id):
     user_id = request.form.get("user_id")
@@ -214,9 +210,9 @@ def shape_analysis(camera_id):
         print(e)
         abort(422)
 
-# Generating funtion for video stream, produces frames from the Pi
+# The generate_frame function/route services incoming frames for the video stream
 def generate_frame(camera_stream, primary_camera):
-    #Frame is either None or a tuple {cam_id, frame (cv2img)}
+    # Frame is either None or a tuple {cam_id, frame (cv2img)}
     frame = camera_stream.get_frame()
     if not frame or (not frame[0] == primary_camera):
         file_name = path.join(path.dirname(__file__), 'black_img.jpeg')
@@ -228,7 +224,7 @@ def generate_frame(camera_stream, primary_camera):
     return (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-# Video stream, should be the source of the home page video image
+# The video_feed function/route is the source of the home page video imaging
 @bp.route('/video_feed/<int:primary_camera>')
 def video_feed(primary_camera):
     global camera_stream
@@ -245,6 +241,7 @@ def video_feed(primary_camera):
     
     return resp 
 
+# This is a test/placeholder route, an example of how to add an event
 @bp.route("/addEvent")
 @login_required
 def testAddEvent():
@@ -253,6 +250,7 @@ def testAddEvent():
 
     return redirect(url_for('myapp.home'))
 
+# This is a test/placeholder route, an example of how to add a camera
 @bp.route("/addCamera")
 @login_required
 def testAddCamera():
@@ -274,6 +272,7 @@ def camera_name_from_id(id):
     camera = Camera.query.filter_by(id=id).first()
     return camera.name
 
+# The home function/route renders the HTML template for the home page
 @bp.route("/home")
 @bp.route("/", methods=['GET', 'POST'])
 @login_required
@@ -295,6 +294,7 @@ def home():
     
     return render_template("home.html", camera=camera, events=events)
 
+# The login function/route renders the HTML template for the login page
 @bp.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -311,6 +311,7 @@ def login():
     
     return render_template("login.html", form=form)
 
+# The signup function/route renders the HTML template for the signup page
 @bp.route("/signup", methods=['GET', 'POST'])
 def signup():
     form = SignUpForm()
@@ -330,30 +331,35 @@ def signup():
     
     return render_template("signup.html", form=form)
 
+# The logout function/route logs out the current user
 @bp.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('myapp.login'))
 
+# The events function/route renders the HTML template for the events page
 @bp.route("/events")
 @login_required
 def events():
     events = Event.query.filter_by(user_id=current_user.id).order_by(Event.timestamp.desc()).all()
     return render_template("events.html", events=events)
 
+# The event_view function/route renders the HTML template for the event view page
 @bp.route("/view_event/<int:event_id>")
 @login_required
 def event_view(event_id):
     event = Event.query.filter_by(id=event_id).first()
     return render_template("event_view.html", event=event)
 
+# The cameras function/route renders the HTML template for the cameras page
 @bp.route("/cameras")
 @login_required
 def cameras():
     cameras = Camera.query.filter_by(user_id=current_user.id).order_by(Camera.status).all()
     return render_template("cameras.html", cameras=cameras)
 
+# The train function/route renders the HTML template for the train page
 @bp.route("/train", methods=['GET', 'POST'])
 @login_required
 def train():
@@ -381,6 +387,7 @@ def train():
     
     return render_template("train.html", form=form)
 
+# The download function/route services download requests based on event id
 @bp.route("/download/<int:event_id>")
 @login_required
 def download(event_id):
@@ -406,6 +413,7 @@ def download(event_id):
         print("Something Happened: ", e)
         return e
 
+# The send_to_s3 function uploads a file to its corresponding S3 bucket
 def send_to_s3(file, bucket_name):
         session = boto3.Session(profile_name='default')
         s3 = session.client('s3')
