@@ -3,6 +3,7 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, EmailField, SelectMultipleField
 from wtforms.validators import InputRequired, Email, Length
 
+# The LoginForm describes the fields and validators corresponding to the login page
 class LoginForm(FlaskForm):
     email = EmailField('', 
                         validators=[InputRequired(), Email(message='Invalid email!'), Length(max=50)],
@@ -11,6 +12,7 @@ class LoginForm(FlaskForm):
                             validators=[InputRequired(), Length(min=6, max=80)],
                             render_kw={"placeholder": "Password"})
 
+# The SignUpForm describes the fields and validators corresponding to the signup page
 class SignUpForm(FlaskForm):
     name = StringField('', 
                         validators=[InputRequired(), Length(min=2, max=50)],
@@ -22,6 +24,7 @@ class SignUpForm(FlaskForm):
                             validators=[InputRequired(), Length(min=6, max=80)],
                             render_kw={"placeholder": "Password"})
 
+# The TrainingForm describes the fields and validators corresponding to the training page
 class TrainingForm(FlaskForm):
     file = FileField('Reference image:', validators=[
         FileRequired(),
@@ -38,14 +41,12 @@ class TrainingForm(FlaskForm):
     
     newPersonName = StringField('Add a person',
                         validators=[Length(max=30)],
-                        #render_kw={"placeholder": "New person name"})
                         render_kw={"placeholder": "Person name"})
 
     def validate(self, extra_validators=None):
         if super().validate(extra_validators):
 
             if not ((self.personSelect.data and not self.newPersonName.data) or (not self.personSelect.data and self.newPersonName.data)):
-                #self.newPersonName.errors.append('You must choose an existing person OR provide a new name, not both!')
                 self.newPersonName.errors.append('You must provide a name!')
                 return False
             else:

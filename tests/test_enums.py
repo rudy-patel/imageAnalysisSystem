@@ -2,6 +2,8 @@ from server.main import enum_to_string, camera_name_from_id
 from server.models.models import Camera
 import enum
 
+# This file holds tests for enums
+
 class TestEnum(enum.Enum):
     TEST = "TEST_VALUE"
 

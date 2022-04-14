@@ -2,6 +2,8 @@ from flask import json
 from server.models.models import Users, Camera
 from server.main import calc_hash
 
+# This file holds tests for the existing API routes
+
 def test_heartbeat(test_client):
     cameraID = 2
     response = test_client.get("/heartbeat/" + str(cameraID))

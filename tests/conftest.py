@@ -2,6 +2,8 @@ import pytest
 from flask import template_rendered
 from server.main import create_app
 
+# This file holds the test setup for existing API routes
+
 @pytest.fixture()
 def app():
     app = create_app()

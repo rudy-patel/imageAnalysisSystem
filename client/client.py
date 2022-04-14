@@ -15,6 +15,8 @@ from collections import defaultdict
 import numpy as np
 import hashlib
 
+# This file holds the client script that runs on the Raspberry Pi
+
 class Client():
     def __init__(self, ip, port):
         self.port = port
@@ -64,8 +66,6 @@ class Client():
             except:
                 return
 
-
-
     def get_new_encodings(self):
             try:
                 encodings = requests.get("http://" + self.ip + ":" + self.port + "/v1/encodings")
@@ -78,7 +78,6 @@ class Client():
                 print("Failed to load new encodings data")
                 print(e)
             
-            
     def calc_hash():
         BUF_SIZE = 65536
         sha1 = hashlib.sha1()
@@ -90,8 +89,6 @@ class Client():
                 sha1.update(data)
         return sha1.hexdigest()
 
-
-    
     # circle_detect algorithm from: https://pyimagesearch.com/2014/07/21/detecting-circles-images-using-opencv-hough-circles/
     def circle_detect(self, frame):
         now = int(time.time())
@@ -112,7 +109,6 @@ class Client():
         
         return frame
         
-    
     def circle_detect_event(self, frame):
         stamp = int(time.time())
         if stamp - self.timeouts["circle"] < self.timeout_duration: # Check for timeout
@@ -143,8 +139,6 @@ class Client():
         os.remove(path)
         
         self.timeouts["circle"] = stamp # update timeout
-
-
 
     # Send a POST request to the server event route
     def facial_req_event(self, name, frame):
@@ -177,7 +171,6 @@ class Client():
         os.remove(path)
         
         self.timeouts[name] = stamp # update timeout
-
 
     # Takes a frame and returns a cv2 facial req boxed frame
     def facial_req(self, frame, data):
@@ -242,7 +235,6 @@ class Client():
             self.facial_req_event(names[0], frame)
         
         return frame # display the image to our screen
-
 
 def main():
     client = Client("127.0.0.1", "5000")
