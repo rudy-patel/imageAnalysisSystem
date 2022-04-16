@@ -7,6 +7,20 @@
 # Image Analysis System
 This system is a low-footprint versatile application involving hardware and software components for recognition of shapes and/or faces through machine learning algorithms. 
 
+### Web interface
+#### Home
+After logging in, you will be greeted with the **home page**. Here, you can see the **livestream** of your primary camera (if online), any recent **events**, and also **switch** classification modes between facial/shape detection!
+![Home screen](assets/home_page.png)
+#### Events
+On the **events** page, you can sort/search your way through any captured events from your cameras!
+![Events](assets/events_page.gif)
+#### Cameras
+On the **cameras** page, you can see all of the cameras associated with your account, along with seeing their online/offline status, recognition mode, and when it was last online.
+![Cameras](assets/cameras_page.png)
+#### Train
+On the **train** page, you can upload your own reference images to retrain the machine learning models to recognize new faces or simply improve the accuracy.
+![Train](assets/train_page.gif)
+
 ### First time setup
 This project runs inside a Python virtual environment. To set up your environment, follow these steps:
 1. Navigate to the root directory in terminal
@@ -44,19 +58,6 @@ To run tests, in your virtual environment run:
 ```bash
 python -m pytest
 ```
-
-### Web interface
-After logging in, you will be greeted with the **home page**. Here, you can see the **livestream** of your primary camera (if online), any recent **events**, and also **switch** classification modes between facial/shape detection!
-![Home screen](assets/home_page.png)
-
-On the **events** page, you can sort/search your way through any captured events from your cameras!
-![Events](assets/events_page.gif)
-
-On the **cameras** page, you can see all of the cameras associated with your account, along with seeing their online/offline status, recognition mode, and when it was last online.
-![Cameras](assets/cameras_page.png)
-
-On the **train** page, you can upload your own reference images to retrain the machine learning models to recognize new faces or simply improve the accuracy.
-![Train](assets/train_page.gif)
 
 ### Project overview
 This capstone project also has an associated poster with additional information:
