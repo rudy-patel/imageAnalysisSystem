@@ -5,7 +5,21 @@
 [![License](https://img.shields.io/github/license/rudy-patel/imageAnalysisSystem)](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Image Analysis System
-This system is a low-footprint versatile application involving hardware and software componenets for recognition of objects and/or faces through machine learning algorithms.
+This system is a low-footprint versatile application involving hardware and software components for recognition of shapes and/or faces through machine learning algorithms. 
+
+### Web interface
+#### Home
+After logging in, you will be greeted with the **home page**. Here, you can see the **livestream** of your primary camera (if online), any recent **events**, and also **switch** classification modes between facial/shape detection!
+![Home screen](assets/home_page.png)
+#### Events
+On the **events** page, you can sort/search your way through any captured events from your cameras!
+![Events](assets/events_page.gif)
+#### Cameras
+On the **cameras** page, you can see all of the cameras associated with your account, along with seeing their online/offline status, recognition mode, and when it was last online.
+![Cameras](assets/cameras_page.png)
+#### Train
+On the **train** page, you can upload your own reference images to retrain the machine learning models to recognize new faces or simply improve the accuracy.
+![Train](assets/train_page.gif)
 
 ### First time setup
 This project runs inside a Python virtual environment. To set up your environment, follow these steps:
@@ -36,7 +50,7 @@ To run the server:
 
 You're all set! The server should now be running on `127.0.0.1:5000`.
 
-### Running the client
+### Running the client (camera unit)
 To run the client:
 
 ### Running tests
@@ -46,19 +60,19 @@ python -m pytest
 ```
 
 ### Project overview
-![overview](LFIAS_2022_04_04_FP_poster.png)
+This capstone project also has an associated poster with additional information:
+![overview](assets/LFIAS_2022_04_04_FP_poster.png)
 
-
-### Resources used
+### Resources
 * [Login using Flask-Login and SQLAlchemy](https://www.youtube.com/watch?v=8aTnmsDMldY)
 * [Data tables with bootstrap4](https://www.youtube.com/watch?v=yGBk9Nalyq8)
 * [Data models in Flask](https://flask-sqlalchemy.palletsprojects.com/en/2.x/models/)
 * [Adding flask-migrate to existing project](https://blog.miguelgrinberg.com/post/how-to-add-flask-migrate-to-an-existing-project)
 * [Flask Multi-Camera Streaming](https://gitee.com/huzhuhua/Flask-Multi-Camera-Streaming-With-YOLOv4-and-Deep-SORT/tree/master)
 ### Contributors
-| Name | Email  |
-|---|---|
-|  Rudy Patel | rutvik@ualberta.ca |
-|  Kaden Dreger | kaden@ualberta.ca |
-|  Jacob Paetsch | jpaetsch@ualberta.ca |
-|  Braden Stolte | bstolte@ualberta.ca |
+| Name | Email  | Github |
+|---|---|---|
+|  Rudy Patel | rutvik@ualberta.ca | [@rudy-patel](https://github.com/rudy-patel)|
+|  Kaden Dreger | kaden@ualberta.ca | [@kaden-dreger](https://github.com/kaden-dreger) |
+|  Jacob Paetsch | jpaetsch@ualberta.ca | [@jpaetsch](https://github.com/jpaetsch)|
+|  Braden Stolte | bstolte@ualberta.ca | [@b-stolte](https://github.com/b-stolte)|
