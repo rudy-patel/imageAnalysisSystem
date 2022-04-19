@@ -7,6 +7,6 @@ Example endpoint description
 **Response**:
 ```json
 {
-    "example": example,
+    "example": "example",
 }
 ```
