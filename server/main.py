@@ -164,7 +164,7 @@ def make_primary(camera_id):
     
     return redirect(url_for('myapp.cameras'))
 
-# The face_detected function/route gets a new face detect event
+# The face_detected function/route registers a new face detect event
 @bp.route("/<int:camera_id>/facial-detection-event", methods=["POST"])
 def face_detected(camera_id):
     user_id = request.form.get("user_id")
@@ -187,7 +187,7 @@ def face_detected(camera_id):
         print(e)
         abort(422)
 
-# The shape_analysis function/route gets a new shape detected event
+# The shape_analysis function/route registers a new shape detected event
 @bp.route("/<int:camera_id>/ring-shape-analysis-event", methods=["POST"])
 def shape_analysis(camera_id):
     user_id = request.form.get("user_id")
