@@ -1,10 +1,16 @@
-Two Raspberry Pi 4's were used and configured using the same series of steps.
+Hardware Configuration from New (note that these instructions are from April 20th, 2022 and will be subject to change)
 
-1)  Raspberry Pi OS (32-bit) was downloaded onto a freshly formatted SD card using the official Raspberry Pi Imager.
-2)  The SD card was inserted and Pi was booted; set Canada location, English (Canada) language, and set Edmonton Time Zone.  Use English language and use US keyboard checkboxes were both selected.
-3)  Default user passwords were changed to 'lfias_capstone'
-4)  Software updates were automatically run after connecting to a Wifi network.
-5)  Client hostnames were set (lfias-pi-steven for one board and lfias-pi-huda for the other)
-6)  The legacy Pi camera interface was enabled (sudo raspi-config was run in the terminal to select this option)
-
-After restarting, the boards were ready for additional installation of functionality packages and local processing libraries/models.
+1)  Get a blank SD card and download Raspberry Pi OS (32-bit) onto it. Used the official Raspberry Pi Imager, which can be found and downloaded at https://www.raspberrypi.com/news/raspberry-pi-imager-imaging-utility/
+2)  Insert the SD card into the Pi and follow the initial set up instructions to set the language, keyboard, and timezone.
+3)  Set a username and password: currently lfias-capstone and p@ssworD
+4)  Connect to a network (either during setup or afterwards using the OS)
+5)  Either automatically update software packages or run the following commands in the terminal after initial setup:
+  *  sudo apt-get update
+  *  sudo apt-get upgrade
+  *  sudo rpi-update
+6)  Activate the camera (liable to change in future Pi firmware versions)
+  * sudo raspi-config
+  * Select: Interface Options > Activate Legacy Camera Support
+8)  Update the Hostname (visible name of the device on the network): currently lfiaspi
+  * sudo raspi-config
+  * Select: System Options > Hostname
