@@ -1,3 +1,4 @@
+import argparse
 import imutils
 from imutils.video import VideoStream
 import face_recognition
@@ -29,7 +30,7 @@ class Client():
         self.encoding_data = pickle.loads(open("encodings.pickle", "rb").read())
         self.timeouts = defaultdict(int)
         self.timeout_duration = 60
-        self.location = "/home/pi/imageAnalysisSystem/client"
+        self.location = "/home/lfias-capstone/LFIAS/client"
         self.heartbeat_interval = 10
         self.last_heartbeat = 0
         self.circle_detection_timeout = 5
@@ -237,7 +238,14 @@ class Client():
         return frame # display the image to our screen
 
 def main():
-    client = Client("127.0.0.1", "5000")
+    parser = argparse.ArgumentParser("Client")
+    parser.add_argument("ip_address", nargs="?", help="The ip address of the server that the client will try to connect to", type=str, const="127.0.0.1", default="127.0.0.1")
+    parser.add_argument("port", nargs="?", help="The port of the server that the client will attempt to connect to.", type=str, const="5000", default="5000")
+    args = parser.parse_args()
+
+    # Start the client and connect to the command-line provided ip address and port
+    # If unspecified, defaults are localhost and port 5000
+    client = Client(args.ip_address, args.port)
     client.run()
 
 if __name__ == "__main__":
