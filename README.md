@@ -28,6 +28,8 @@ This project runs inside a Python virtual environment. To set up your environmen
 
 To setup the hardware unit, follow the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/wiki/Hardware-Configuration).
 
+To setup a new AWS account, follow the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/running-instructions-for-users/docs/aws_setup.txt).
+
 On **Linux/MacOS**:
 - Run `source env/bin/activate` to **start** the Python virtual environment.
 - Run `deactivate` to **stop** the Python virtual environment.
@@ -52,6 +54,8 @@ You're all set! The server should now be running on `127.0.0.1:5000`.
 
 ### Running the client (camera unit)
 To run the client:
+1. Navigate to the root directory in terminal.
+2. `git fetch && git pull` to ensure the code is the latest.
 
 ### Running tests
 To run tests, in your virtual environment run:
