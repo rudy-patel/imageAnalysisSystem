@@ -14,8 +14,8 @@ April 20th, 2022
   * sudo mkdir ~/.aws
   * copy the config and credentials files into this directory
 4)  Export the expected environment variables
-  * export FLASK_APP=main.py
-  * export DB_PASSWORD=dolce5719
+  * export FLASK_APP=server.main.py
+  * export DB_PASSWORD=*insert password here*
 6)  Fix any software package related configuration issues:
   * Example 1: numpy didn't work by default so by tracing the error it was fixed by installing required dependencies (sudo apt-get install libatlas-base-dev)
   * Example 2: psycopg2 was throwing an error and after researching it the following dependency was installed (sudo apt-get install postgresql)
