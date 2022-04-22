@@ -28,7 +28,7 @@ This project runs inside a Python virtual environment. To set up your environmen
 
 To setup the hardware unit, follow the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/wiki/Hardware-Configuration).
 
-To setup a new AWS account, follow the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/running-instructions-for-users/docs/aws_setup.txt).
+To setup a new AWS instance + account, follow the instructions in [AWS Setup](https://github.com/rudy-patel/imageAnalysisSystem/blob/running-instructions-for-users/docs/aws_setup.txt).
 
 On **Linux/MacOS**:
 - Run `source env/bin/activate` to **start** the Python virtual environment.
