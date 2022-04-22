@@ -1,6 +1,6 @@
 Software Configuration from New 
 (note that this will download the full repository and the files could be seperated by client and server if desired)
-April 20th, 2022
+April 20th, 2022 
 
 1)  Create and go into a desired project folder (currently ~/LFIAS) and run:
   * git clone https://github.com/rudy-patel/imageAnalysisSystem.git .
