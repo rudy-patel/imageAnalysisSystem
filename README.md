@@ -29,12 +29,13 @@ On the **train** page, you can upload your own reference images to retrain the m
 Setup the hardware unit by following the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/hardware_config.md).
 
 Place the AWS config and credentials in the aws file:
+
 On **Windows**:
-  1. Navigate to C:/Users/<Your username>/.aws/
+  1. Navigate to `C:/Users/*Your username*/.aws/`
   2. copy the config and credentials files into this directory
    
 On **Linux/MacOS**:
-  1. sudo mkdir ~/.aws
+  1. `sudo mkdir ~/.aws`
   2. copy the config and credentials files into this directory
 
 This project runs inside a Python virtual environment. To set up your environment, follow these steps:
