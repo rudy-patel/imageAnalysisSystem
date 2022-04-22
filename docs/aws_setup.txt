@@ -1,0 +1,63 @@
+1. Create an AWS account and sign in to the AWS console. 
+
+    
+2. First we will create a security group to allow traffic into our aws instance. Search for EC2 in the AWS console and select it. 
+2.1 From the EC2 page, click “security groups” and then “create security group”
+2.2 Give the security group a name and description and create two rules, an outbound rule and an inbound rule. Both rules should have Type: All Traffic, Protocol: All, Port: All, and Destination: Anywhere IPV4. Once the rules have been created click “Create security group”.
+
+
+3. Now we will initialize the SQL database. Type RDS into the AWS search bar and press enter. On the RDS page click “Create Database” 
+3.1 The database should be given Identifier: “lfiasdb”, username: “postgres”, and password of your choosing - make sure the password is written down somewhere safe.
+3.2 Under “Public Access” select “Yes”
+3.3  Under “VPC security group” select “Choose existing” and select the security group we have previously made.
+3.4 Under “Database authentication” select “Password authentication” 
+3.5 All other setting can be left on default, click “Create database”
+3.6 To use this new database in the code, one line will have to be changed: server/main.py line    34. As of now it should look like this:
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:' + environ["DB_PASSWORD"] + '@lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com/postgres'
+
+3.7 From the RDS console, navigate to the newly created database and copy its “Endpoint”. This endpoint should replace the text "lfiasdb.cwtorsyu3gx6.us-west-2.rds.amazonaws.com" in  server/main.py line 34.
+3.8 Now configure the environment variable “DB_PASSWORD” as the password you previously chose. This is done with the “set” command on Windows and the “export” command on Linux/MacOS 
+
+4. Now we will create the S3 file stored bucket to store our images. Search for S3 on the AWS console and select it. Click “Create Bucket”.
+4.1 Name the bucket “lfiasimagestore”
+4.2 Unselect “Block all public access” and acknowledge the public setting below.
+4.3 Leave other settings at default and click “Create bucket”
+4.4 Navigate to the bucket from the S3 console and select “Permissions”
+4.5 Under “Bucket Policy” select Edit and enter the following policy:
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicRead",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject",
+                "s3:GetObjectVersion"
+            ],
+            "Resource": "arn:aws:s3:::lfiasimagestore/*"
+        }
+    ]
+}
+Click “save changes”
+
+4.7 To access this bucket we will first create a non-root user with access credentials. Search for “IAM” in the AWS console and select it. 
+4.8 Select “User groups” on the sidebar and click “Create group”. Name the group “admin” and select the policy “AdministratorAccess” and click “Create Group”
+4.9 Now click “Users” on the side bar and click “Create User”
+4.10 Make a username for the user and select “Access key - Programmatic access”, click Next
+4.11  Select the previously created User group and click Next 
+4.12 Skip the next two step and click “Create user”, you will be provided with an access key and a secret access key, save or download these strings 
+4.12 Now we will let the server know about this AWS instance. To do this we will navigate to our computers home directory and create a directory called “.aws”. In this directory we should create two files, config.txt and  credentials.txt
+4.13 config.txt should contain the following text (assuming the bucket was created in us-west-2):
+[default]
+region = us-west-2
+
+4.14 credentials.txt should contain the following text:
+[default]
+aws_access_key_id=AKIAVFCBRF2EXAMPLE
+aws_secret_access_key=US/vFIn2FvZImBEXAMPLE
+
+Replace these values with the keys that we just saved.
+
+4.15 Now save these files and AWS will be fully configured. Upon running the server the aws credentials will automatically be detected. 
