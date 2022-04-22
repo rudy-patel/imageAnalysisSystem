@@ -28,6 +28,15 @@ On the **train** page, you can upload your own reference images to retrain the m
 ### First time setup
 Setup the hardware unit by following the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/hardware_config.md).
 
+Place the AWS config and credentials in the aws file:
+On **Windows**:
+  1. Navigate to C:/Users/<Your username>/.aws/
+  2. copy the config and credentials files into this directory
+   
+On **Linux/MacOS**:
+  1. sudo mkdir ~/.aws
+  2. copy the config and credentials files into this directory
+
 This project runs inside a Python virtual environment. To set up your environment, follow these steps:
 1. Navigate to the root directory in terminal
 2. Create a virtual environment using: `python3 -m venv env`
@@ -36,11 +45,15 @@ This project runs inside a Python virtual environment. To set up your environmen
 
 On **Linux/MacOS**:
 - Run `source env/bin/activate` to **start** the Python virtual environment.
+- `export FLASK_APP=server.main.py`
+- `export DB_PASSWORD=*insert DB_password here*`
 - Run `deactivate` to **stop** the Python virtual environment.
 - If you need to set an environment variable use: `export <variable>=<value>`. This is only saved in your current terminal.
 
 On **Windows**:
 - Run `.\env\Scripts\activate` to **start** the Python virtual environment.
+- `set FLASK_APP=server.main.py`
+- `set DB_PASSWORD=*insert DB_password here*`
 - Run `deactivate` to **stop** the Python virtual environment.
 - If you need to set an environment variable use: `set <variable>=<value>`. This is only saved in your current terminal.
 
