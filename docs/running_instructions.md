@@ -9,7 +9,7 @@ Running the Client and Server locally on the Pi:
   * flask run
 3) Access the site via 127.0.0.1/5000 on the Pi web browser
 
-Running the Client and Server over LAN:
+Running the Client and Server over LAN (preferred):
 1) Navigate to the client/ folder and run the following command inside to run on the device where the server is running
    Note that <ip_address> and <port> should be typed out as additional arguments to tell the client the ip/port to connect to
   * python client.py <ip_address> <port>
