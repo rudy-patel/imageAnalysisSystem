@@ -244,7 +244,7 @@ def main():
     args = parser.parse_args()
 
     # Start the client and connect to the command-line provided ip address and port
-    # If unspecified, defaults are localhost and port 5000
+    # If unspecified, defaults are localhost and port 5000 
     client = Client(args.ip_address, args.port)
     client.run()
 
