@@ -26,13 +26,13 @@ On the **train** page, you can upload your own reference images to retrain the m
 ![Train](assets/train_page.gif)
 
 ### First time setup
+Setup the hardware unit by following the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/hardware_config.md).
+
 This project runs inside a Python virtual environment. To set up your environment, follow these steps:
 1. Navigate to the root directory in terminal
 2. Create a virtual environment using: `python3 -m venv env`
 
-To setup the hardware unit, follow the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/hardware_config.md).
-
-To setup a new AWS instance + account, follow the instructions in [AWS Setup](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/aws_setup.txt).
+(Optional) To setup a new AWS instance + account, follow the instructions in [AWS Setup](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/aws_setup.txt).
 
 On **Linux/MacOS**:
 - Run `source env/bin/activate` to **start** the Python virtual environment.
