@@ -26,9 +26,9 @@ This project runs inside a Python virtual environment. To set up your environmen
 1. Navigate to the root directory in terminal
 2. Create a virtual environment using: `python3 -m venv env`
 
-To setup the hardware unit, follow the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/wiki/Hardware-Configuration).
+To setup the hardware unit, follow the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/hardware_config.md).
 
-To setup a new AWS instance + account, follow the instructions in [AWS Setup](https://github.com/rudy-patel/imageAnalysisSystem/blob/running-instructions-for-users/docs/aws_setup.txt).
+To setup a new AWS instance + account, follow the instructions in [AWS Setup](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/aws_setup.txt).
 
 On **Linux/MacOS**:
 - Run `source env/bin/activate` to **start** the Python virtual environment.
@@ -55,10 +55,10 @@ You're all set! The server should now be running on `127.0.0.1:5000`.
 ### Running the client (camera unit)
 Running the Client over **LAN** (preferred):
 1. Navigate to the root directory in terminal.
-2. Navigate to the client/ folder and run `python client.py <ip_address> <port>`.
-   Note that <ip_address> and <port> should be typed out as additional arguments to tell the client the ip/port to connect to.
+2. Navigate to the `client/` folder and run `python client.py <ip_address> <port>`.
+   Note that `<ip_address>` and `<port>` should be typed out as additional arguments to tell the client the ip/port to connect to.
   
-Additional instructions for running the client/server can be found [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/running-instructions-for-users/docs/running_instructions.md).
+Additional instructions for running the client/server can be found [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/running_instructions.md).
    
 ### Running tests
 To run tests, in your virtual environment run:
