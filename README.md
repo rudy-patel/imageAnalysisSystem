@@ -53,7 +53,7 @@ To run the server:
 You're all set! The server should now be running on `127.0.0.1:5000`.
 
 ### Running the client (camera unit)
-Running the Client over LAN (preferred):
+Running the Client over **LAN** (preferred):
 1. Navigate to the root directory in terminal.
 2. `git fetch && git pull` to ensure the code is the latest.
 3. Navigate to the client/ folder and run `python client.py <ip_address> <port>`.
