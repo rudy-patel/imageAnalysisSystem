@@ -55,8 +55,8 @@ region = us-west-2
 
 4.14 credentials.txt should contain the following text:
 [default]
-aws_access_key_id=AKIAVFCBRF2EXAMPLE
-aws_secret_access_key=US/vFIn2FvZImBEXAMPLE
+aws_access_key_id=*insert key here*
+aws_secret_access_key=*insert key here*
 
 Replace these values with the keys that we just saved.
 
