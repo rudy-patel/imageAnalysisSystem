@@ -10,33 +10,51 @@ This system is a low-footprint versatile application involving hardware and soft
 ### Web interface
 #### Home
 After logging in, you will be greeted with the **home page**. Here, you can see the **livestream** of your primary camera (if online), any recent **events**, and also **switch** classification modes between facial/shape detection!
+
 ![Home screen](assets/home_page.png)
 #### Events
 On the **events** page, you can sort/search your way through any captured events from your cameras!
+
 ![Events](assets/events_page.gif)
 #### Cameras
 On the **cameras** page, you can see all of the cameras associated with your account, along with seeing their online/offline status, recognition mode, and when it was last online.
+
 ![Cameras](assets/cameras_page.png)
 #### Train
 On the **train** page, you can upload your own reference images to retrain the machine learning models to recognize new faces or simply improve the accuracy.
+
 ![Train](assets/train_page.gif)
 
 ### First time setup
+Setup the hardware unit by following the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/hardware_config.md).
+
+Place the AWS config and credentials in the aws file:
+
+On **Windows**:
+  1. Navigate to `C:/Users/*Your username*/.aws/`
+  2. copy the config and credentials files into this directory
+   
+On **Linux/MacOS**:
+  1. `sudo mkdir ~/.aws`
+  2. copy the config and credentials files into this directory
+
 This project runs inside a Python virtual environment. To set up your environment, follow these steps:
 1. Navigate to the root directory in terminal
 2. Create a virtual environment using: `python3 -m venv env`
 
-To setup the hardware unit, follow the instructions [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/hardware_config.md).
-
-To setup a new AWS instance + account, follow the instructions in [AWS Setup](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/aws_setup.txt).
+(Optional) To setup a new AWS instance + account, follow the instructions in [AWS Setup](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/aws_setup.txt).
 
 On **Linux/MacOS**:
 - Run `source env/bin/activate` to **start** the Python virtual environment.
+- `export FLASK_APP=server.main.py`
+- `export DB_PASSWORD=*insert DB_password here*`
 - Run `deactivate` to **stop** the Python virtual environment.
 - If you need to set an environment variable use: `export <variable>=<value>`. This is only saved in your current terminal.
 
 On **Windows**:
 - Run `.\env\Scripts\activate` to **start** the Python virtual environment.
+- `set FLASK_APP=server.main.py`
+- `set DB_PASSWORD=*insert DB_password here*`
 - Run `deactivate` to **stop** the Python virtual environment.
 - If you need to set an environment variable use: `set <variable>=<value>`. This is only saved in your current terminal.
 
