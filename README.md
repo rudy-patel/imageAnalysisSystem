@@ -42,7 +42,7 @@ On **Windows**:
 
 You have now created the virtual environment in the project directory, continue following the steps to run the server.
 
-### Running the server
+### Running the server (web interface)
 To run the server:
 
 1. Navigate to the root directory in terminal.
