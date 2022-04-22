@@ -56,7 +56,7 @@ You're all set! The server should now be running on `127.0.0.1:5000`.
 Running the Client over **LAN** (preferred):
 1. Navigate to the root directory in terminal.
 2. Navigate to the `client/` folder and run `python client.py <ip_address> <port>`.
-   Note that `<ip_address> and <port>` should be typed out as additional arguments to tell the client the ip/port to connect to.
+   Note that `<ip_address>` and `<port>` should be typed out as additional arguments to tell the client the ip/port to connect to.
   
 Additional instructions for running the client/server can be found [here](https://github.com/rudy-patel/imageAnalysisSystem/blob/main/docs/running_instructions.md).
    
