@@ -121,7 +121,7 @@ class Client():
         cv2.imwrite(filename, frame)
 
         data = {
-            "user_id": 4,
+            "user_id": 7,
             "name": "circle",
             "event_type": "SHAPE_DETECT_SUCCESS",
             "timestamp": datetime.now(), 
@@ -153,7 +153,7 @@ class Client():
         cv2.imwrite(filename, frame)
 
         data = {
-            "user_id": 4,
+            "user_id": 7,
             "name": name,
             "event_type": "FACIAL_MATCH_SUCCESS",
             "timestamp": datetime.now(), 
